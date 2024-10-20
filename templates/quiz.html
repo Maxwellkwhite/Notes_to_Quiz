@@ -23,22 +23,13 @@
 
 <script>
 let currentQuestion = 0;
-let correctAnswers = 0;
-let wrongAnswers = 0;
 const questions = {{ quiz.questions|tojson }};
+const userAnswers = [];
 
 function submitAnswer() {
     const selectedAnswer = document.querySelector('input[name="quizQuestion"]:checked');
     if (selectedAnswer) {
-        const userAnswer = selectedAnswer.value;
-        const correctAnswer = questions[currentQuestion].answer;
-        
-        if (userAnswer === correctAnswer) {
-            correctAnswers++;
-        } else {
-            wrongAnswers++;
-        }
-        
+        userAnswers.push(selectedAnswer.value);
         currentQuestion++;
         if (currentQuestion < questions.length) {
             updateQuestion();
@@ -69,10 +60,31 @@ function updateQuestion() {
 
 function showResults() {
     const quizContainer = document.querySelector('.question-container');
-    quizContainer.innerHTML = `
-        <h2 class="mb-3">Quiz Complete!</h2>
-        <p>Correct Answers: ${correctAnswers}</p>
-        <p>Wrong Answers: ${wrongAnswers}</p>
-    `;
+    let resultsHTML = '<h2 class="mb-3">Quiz Results</h2>';
+    
+    questions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const correctAnswer = question.answer;
+        const isCorrect = userAnswer === correctAnswer;
+        
+        resultsHTML += `
+            <div class="mb-4">
+                <h4>Question ${index + 1}:</h4>
+                <p>${question.question}</p>
+                <ul class="list-group">
+                    ${question.options.map(option => `
+                        <li class="list-group-item ${option === userAnswer ? (isCorrect ? 'list-group-item-success' : 'list-group-item-danger') : ''}
+                                                    ${option === correctAnswer && !isCorrect ? 'list-group-item-success' : ''}">
+                            ${option}
+                            ${option === userAnswer ? ' (Your Answer)' : ''}
+                            ${option === correctAnswer ? ' (Correct Answer)' : ''}
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+    });
+    
+    quizContainer.innerHTML = resultsHTML;
 }
 </script>
