@@ -15,13 +15,15 @@ import stripe
 import os
 import smtplib
 import json
+from flask_ckeditor import CKEditorField
 
 APP_NAME = 'ENTER HERE'
+
 
 app = Flask(__name__)
 ckeditor = CKEditor(app)
 Bootstrap5(app)
-app.config['SECRET_KEY'] = os.environ.get('FLASK_KEY')
+app.config['SECRET_KEY'] = '1afjdlkafjd'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -60,6 +62,12 @@ class Feedback(FlaskForm):
     feedback = StringField("Feedback", validators=[DataRequired()])
     submit = SubmitField("Provide Feedback")
 
+class NoteInput(FlaskForm):
+    title = StringField("Title", validators=[DataRequired()])
+    subject = StringField("Subject", validators=[DataRequired()])
+    content = CKEditorField("Content", validators=[DataRequired()], render_kw={"rows": 10})
+    submit = SubmitField("Save Notes")
+
 #user DB
 class User(UserMixin, db.Model):
     __tablename__ = "users"
@@ -81,6 +89,13 @@ def quiz():
     with open('economics_quiz.json', 'r') as file:
         quiz = json.load(file)
     return render_template("quiz.html", quiz=quiz)
+
+@app.route('/note-input', methods=["GET", "POST"])
+def note_input():
+    form = NoteInput()
+    #need to add logic to save the note to the database
+    #ensure data is saved to the database for the notes
+    return render_template("note_input.html", form=form)
 
 @app.route('/register', methods=["GET", "POST"])
 def register():

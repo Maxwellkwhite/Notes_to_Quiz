@@ -1,0 +1,24 @@
+{% include "header.html" %}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Enter Your Notes</h1>
+    <form method="POST" action="{{ url_for('note_input') }}">
+        {{ form.csrf_token }}
+        <div class="mb-3">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.subject.label(class="form-label") }}
+            {{ form.subject(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.content.label(class="form-label") }}
+            {{ form.content(class="form-control") }}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+</div>
+
+{{ ckeditor.load() }}
+{{ ckeditor.config(name='content') }}
