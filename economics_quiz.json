@@ -1,0 +1,96 @@
+{  
+   "quizTitle":"Economics Quiz",
+   "quizSynopsis":"Test your knowledge on economics concepts like supply and demand, price elasticity, consumer theory, and income / substitution effects.",
+   "questions":[  
+      {  
+         "question":"What does the Demand Curve measure?",
+         "options":[  
+            "Willingness of consumers to buy the good",
+            "Willingness of producers to sell the good",
+            "The minimum wage level",
+            "Economic equity"
+         ],
+         "answer":"Willingness of consumers to buy the good"
+      },
+      {  
+         "question":"What is market equilibrium?",
+         "options":[  
+            "Intersection of supply and demand curve",
+            "When demand is higher than supply",
+            "When supply is higher than demand",
+            "Shift in consumer tastes"
+         ],
+         "answer":"Intersection of supply and demand curve"
+      },
+      {  
+         "question":"What causes the supply and demand curves to shift?",
+         "options":[  
+            "Shocks in consumer tastes",
+            "Shocks to the ability of producers to supply",
+            "Changes in price of complement/substitute goods",
+            "All of the above"
+         ],
+         "answer":"All of the above"
+      },
+      {  
+         "question":"What is the effect of perfectly inelastic demand?",
+         "options":[  
+            "Significant increase in firm revenue",
+            "Significant decrease in firm revenue",
+            "No change in firm revenue",
+            "None of the above"
+         ],
+         "answer":"No change in firm revenue"
+      },
+      {  
+         "question":"What characterizes a good with perfectly elastic demand?",
+         "options":[  
+            "It has perfect substitutes",
+            "It has no substitutes",
+            "Its price doesn't affect its demand",
+            "Its demand doesn't affect its price"
+         ],
+         "answer":"It has perfect substitutes"
+      },
+      {  
+         "question":"What fundamental assumptions are made about consumer preferences?",
+         "options":[  
+            "Preferences decline over time",
+            "Preferences include price considerations",
+            "Preferences are complete, transitive, and non-satiated",
+            "None of the above"
+         ],
+         "answer":"Preferences are complete, transitive, and non-satiated"
+      },
+      {  
+         "question":"What happens when income rises for normal goods?",
+         "options":[  
+            "They decline",
+            "Their consumption remains the same or increases",
+            "Their consumption becomes elastic",
+            "None of the above"
+         ],
+         "answer":"Their consumption remains the same or increases"
+      },
+      {  
+         "question":"What influences a consumer's optimal bundle of goods?",
+         "options":[  
+            "Price trends",
+            "Economic projections",
+            "Point of tangency between the indifference curve and the budget line",
+            "None of the above"
+         ],
+         "answer":"Point of tangency between the indifference curve and the budget line"
+      },
+      {  
+         "question":"What are the effects of an increase in wage rate in labor supply?",
+         "options":[  
+            "It always increases labor supply",
+            "It always decreases labor supply",
+            "It has both an income effect and a substitution effect",
+            "None of the above"
+         ],
+         "answer":"It has both an income effect and a substitution effect"
+      }
+   ]
+}
