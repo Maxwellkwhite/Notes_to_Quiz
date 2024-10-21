@@ -1,30 +1,63 @@
 {% include "header.html" %}
 <div class="container mt-5">
-    <h1 class="mb-4">{{ quiz.quizTitle }}</h1>
-    <p class="mb-4">{{ quiz.quizSynopsis }}</p>
-
-<div class="question-container">
-    <h2 class="mb-3">Question <span id="questionNumber">1</span>:</h2>
-    <p class="mb-3" id="questionText">{{ quiz.questions[0].question }}</p>
-    <form id="quizForm">
-        <div id="optionsContainer">
-            {% for option in quiz.questions[0].options %}
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="radio" name="quizQuestion" id="option{{ loop.index }}" value="{{ option }}">
-                <label class="form-check-label" for="option{{ loop.index }}">
-                    {{ option }}
-                </label>
-            </div>
-            {% endfor %}
+    <div class="row">
+        <!-- CKEditor Notes Box -->
+        <div class="col-md-6">
+            <h2>Notes</h2>
+            <form method="POST" action="{{ url_for('quiz') }}">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.content.label }}
+                    {{ form.content(class="form-control") }}
+                    {{ ckeditor.load() }}
+                    {{ ckeditor.config(name='content') }}
+                </div>
+                {{ form.submit(class="btn btn-primary mt-3") }}
+            </form>
         </div>
-        <button type="button" class="btn btn-primary mt-3" onclick="submitAnswer()">Submit</button>
-    </form>
+
+        <!-- Quiz Section -->
+        <div class="col-md-6">
+            <h1 class="mb-4">{{ quiz.quizTitle }}</h1>
+            <p class="mb-4">{{ quiz.quizSynopsis }}</p>
+
+            <div id="quizContainer">
+                <!-- Quiz content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 let currentQuestion = 0;
-const questions = {{ quiz.questions|tojson }};
+const quiz = {{ quiz|tojson }};
+const questions = quiz.questions;
 const userAnswers = [];
+
+function loadQuestion() {
+    const quizContainer = document.getElementById('quizContainer');
+    const question = questions[currentQuestion];
+    
+    let questionHTML = `
+        <h2 class="mb-3">Question ${currentQuestion + 1}:</h2>
+        <p class="mb-3">${question.question}</p>
+        <form id="quizForm">
+            <div id="optionsContainer">
+                ${question.options.map((option, index) => `
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="quizQuestion" id="option${index}" value="${option}">
+                        <label class="form-check-label" for="option${index}">
+                            ${option}
+                        </label>
+                    </div>
+                `).join('')}
+            </div>
+            <button type="button" class="btn btn-primary mt-3" onclick="submitAnswer()">Submit</button>
+        </form>
+    `;
+    
+    quizContainer.innerHTML = questionHTML;
+}
 
 function submitAnswer() {
     const selectedAnswer = document.querySelector('input[name="quizQuestion"]:checked');
@@ -32,7 +65,7 @@ function submitAnswer() {
         userAnswers.push(selectedAnswer.value);
         currentQuestion++;
         if (currentQuestion < questions.length) {
-            updateQuestion();
+            loadQuestion();
         } else {
             showResults();
         }
@@ -41,25 +74,8 @@ function submitAnswer() {
     }
 }
 
-function updateQuestion() {
-    document.getElementById('questionNumber').textContent = currentQuestion + 1;
-    document.getElementById('questionText').textContent = questions[currentQuestion].question;
-    const optionsContainer = document.getElementById('optionsContainer');
-    optionsContainer.innerHTML = '';
-    questions[currentQuestion].options.forEach((option, index) => {
-        optionsContainer.innerHTML += `
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="radio" name="quizQuestion" id="option${index + 1}" value="${option}">
-                <label class="form-check-label" for="option${index + 1}">
-                    ${option}
-                </label>
-            </div>
-        `;
-    });
-}
-
 function showResults() {
-    const quizContainer = document.querySelector('.question-container');
+    const quizContainer = document.getElementById('quizContainer');
     let resultsHTML = '<h2 class="mb-3">Quiz Results</h2>';
     
     questions.forEach((question, index) => {
@@ -87,4 +103,7 @@ function showResults() {
     
     quizContainer.innerHTML = resultsHTML;
 }
+
+// Load the first question when the page loads
+document.addEventListener('DOMContentLoaded', loadQuestion);
 </script>

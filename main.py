@@ -5,7 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, PasswordField
 from wtforms.validators import DataRequired, Email
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, Date
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -16,9 +16,15 @@ import os
 import smtplib
 import json
 from flask_ckeditor import CKEditorField
+from datetime import date
+import datetime
+import os
+from openai import OpenAI
+
 
 APP_NAME = 'ENTER HERE'
 
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 ckeditor = CKEditor(app)
@@ -63,9 +69,9 @@ class Feedback(FlaskForm):
     submit = SubmitField("Provide Feedback")
 
 class NoteInput(FlaskForm):
+    class_name = StringField("Class Name", validators=[DataRequired()])
     title = StringField("Title", validators=[DataRequired()])
-    subject = StringField("Subject", validators=[DataRequired()])
-    content = CKEditorField("Content", validators=[DataRequired()], render_kw={"rows": 10})
+    content = CKEditorField("Notes", validators=[DataRequired()])
     submit = SubmitField("Save Notes")
 
 #user DB
@@ -76,6 +82,23 @@ class User(UserMixin, db.Model):
     password: Mapped[str] = mapped_column(String(100))
     name: Mapped[str] = mapped_column(String(100))
     premium_level: Mapped[int] = mapped_column(Integer)
+    date_of_signup: Mapped[Date] = mapped_column(Date)
+    end_date_premium: Mapped[Date] = mapped_column(Date)
+    points: Mapped[int] = mapped_column(Integer)
+
+class NoteList(db.Model):
+    __tablename__ = "note_lists"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    # Create Foreign Key, "users.id" the users refers to the tablename of User.
+    user_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
+    class_name: Mapped[str] = mapped_column(String(250), unique=False, nullable=False)
+    title: Mapped[str] = mapped_column(String(250))
+    content: Mapped[str] = mapped_column(String())
+
+class Quiz(db.Model):
+    __tablename__ = "quizzes"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    quiz_json: Mapped[str] = mapped_column(String())
 
 with app.app_context():
     db.create_all()
@@ -86,16 +109,53 @@ def home_page():
 
 @app.route('/quiz', methods=["GET", "POST"])
 def quiz():
-    with open('economics_quiz.json', 'r') as file:
-        quiz = json.load(file)
-    return render_template("quiz.html", quiz=quiz)
-
-@app.route('/note-input', methods=["GET", "POST"])
-def note_input():
     form = NoteInput()
-    #need to add logic to save the note to the database
-    #ensure data is saved to the database for the notes
-    return render_template("note_input.html", form=form)
+    if form.validate_on_submit():
+        new_note = NoteList(
+            user_id=current_user.id,
+            class_name=form.class_name.data,
+            title=form.title.data,
+            content=form.content.data,
+        )
+        db.session.add(new_note)
+        db.session.commit()
+        completion = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a quiz generator assistant."},
+                {
+                    "role": "user",
+                    "content": f"Create a quiz based on the following notes. Output the quiz in JSON format:\n\n{form.content.data}"
+                }
+            ]
+        )
+        quiz_json = completion.choices[0].message.content
+        new_quiz = Quiz(
+            quiz_json=quiz_json
+        )
+        db.session.add(new_quiz)
+        db.session.commit()
+    quiz = Quiz.query.order_by(Quiz.id.desc()).first()
+    return render_template("quiz.html", quiz=quiz, form=form)
+
+@app.route('/notes', methods=["GET", "POST"])
+def notes():
+    # if not current_user.is_authenticated:
+    #     return redirect(url_for('login'))
+    form = NoteInput()
+    if form.validate_on_submit():
+        new_note = NoteList(
+            user_id=current_user.id,
+            class_name=form.class_name.data,
+            title=form.title.data,
+            content=form.content.data,
+        )
+        db.session.add(new_note)
+        db.session.commit()
+        flash('Note added successfully!')
+    # Get notes for the current user
+    user_notes = NoteList.query.filter_by(user_id=current_user.id).all()
+    return render_template("notes.html", form=form, notes=user_notes)
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -119,13 +179,16 @@ def register():
             email=form.email.data,
             name=form.name.data,
             password=hash_and_salted_password,
-            premium=0
+            date_of_signup=datetime.date.today(),
+            end_date_premium=datetime.date.today(),
+            premium_level=0,
+            points = 0,
         )
         db.session.add(new_user)
         db.session.commit()
         # This line will authenticate the user with Flask-Login
         login_user(new_user)
-        return redirect(url_for("INSERT HERE"))
+        return redirect(url_for("notes"))
     return render_template("register.html", form=form, current_user=current_user)
 
 @app.route('/login', methods=["GET", "POST"])
