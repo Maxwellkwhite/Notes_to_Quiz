@@ -12,6 +12,11 @@
                     <div class="card-body">
                         {{ note.content | safe }}
                     </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('quiz', note_id=note.id) }}" class="btn btn-primary btn-sm">
+                            Create Quiz
+                        </a>
+                    </div>
                 </div>
             {% endfor %}
         </div>

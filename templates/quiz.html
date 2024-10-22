@@ -1,109 +1,50 @@
 {% include "header.html" %}
 <div class="container mt-5">
-    <div class="row">
-        <!-- CKEditor Notes Box -->
-        <div class="col-md-6">
-            <h2>Notes</h2>
-            <form method="POST" action="{{ url_for('quiz') }}">
-                {{ form.hidden_tag() }}
-                <div class="form-group">
-                    {{ form.content.label }}
-                    {{ form.content(class="form-control") }}
-                    {{ ckeditor.load() }}
-                    {{ ckeditor.config(name='content') }}
-                </div>
-                {{ form.submit(class="btn btn-primary mt-3") }}
-            </form>
+    {% if quiz %}
+        <h1 class="mb-4">Quiz for: {{ note.title }}</h1>
+        <p class="mb-4">Based on your notes from: {{ note.class_name }}</p>
+
+        <div id="quiz-container">
+            {{ quiz.quiz_json | safe }}
         </div>
 
-        <!-- Quiz Section -->
-        <div class="col-md-6">
-            <h1 class="mb-4">{{ quiz.quizTitle }}</h1>
-            <p class="mb-4">{{ quiz.quizSynopsis }}</p>
+        <!-- Commented out JavaScript for now
+        <script>
+            // let currentQuestion = 0;
+            // let questions = [];
+            // let userAnswers = [];
 
-            <div id="quizContainer">
-                <!-- Quiz content will be dynamically inserted here -->
-            </div>
-        </div>
-    </div>
-</div>
+            // // Parse the quiz JSON
+            // try {
+            //     questions = JSON.parse({{ quiz.quiz_json | tojson }});
+            // } catch (error) {
+            //     console.error("Error parsing quiz JSON:", error);
+            // }
 
-<script>
-let currentQuestion = 0;
-const quiz = {{ quiz|tojson }};
-const questions = quiz.questions;
-const userAnswers = [];
+            // function displayQuestion() {
+            //     // ... (rest of the displayQuestion function)
+            // }
 
-function loadQuestion() {
-    const quizContainer = document.getElementById('quizContainer');
-    const question = questions[currentQuestion];
-    
-    let questionHTML = `
-        <h2 class="mb-3">Question ${currentQuestion + 1}:</h2>
-        <p class="mb-3">${question.question}</p>
-        <form id="quizForm">
-            <div id="optionsContainer">
-                ${question.options.map((option, index) => `
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="radio" name="quizQuestion" id="option${index}" value="${option}">
-                        <label class="form-check-label" for="option${index}">
-                            ${option}
-                        </label>
-                    </div>
-                `).join('')}
-            </div>
-            <button type="button" class="btn btn-primary mt-3" onclick="submitAnswer()">Submit</button>
+            // function nextQuestion() {
+            //     // ... (rest of the nextQuestion function)
+            // }
+
+            // function submitQuiz() {
+            //     // ... (rest of the submitQuiz function)
+            // }
+
+            // // Initial display
+            // displayQuestion();
+
+            // // Add event listener to submit button
+            // document.getElementById('submit-quiz').addEventListener('click', submitQuiz);
+        </script>
+        -->
+    {% else %}
+        <p>No quiz available. Please generate a quiz first.</p>
+        <form method="POST">
+            <input type="hidden" name="generate_quiz" value="true">
+            <button type="submit" class="btn btn-primary">Generate Quiz</button>
         </form>
-    `;
-    
-    quizContainer.innerHTML = questionHTML;
-}
-
-function submitAnswer() {
-    const selectedAnswer = document.querySelector('input[name="quizQuestion"]:checked');
-    if (selectedAnswer) {
-        userAnswers.push(selectedAnswer.value);
-        currentQuestion++;
-        if (currentQuestion < questions.length) {
-            loadQuestion();
-        } else {
-            showResults();
-        }
-    } else {
-        alert("Please select an answer.");
-    }
-}
-
-function showResults() {
-    const quizContainer = document.getElementById('quizContainer');
-    let resultsHTML = '<h2 class="mb-3">Quiz Results</h2>';
-    
-    questions.forEach((question, index) => {
-        const userAnswer = userAnswers[index];
-        const correctAnswer = question.answer;
-        const isCorrect = userAnswer === correctAnswer;
-        
-        resultsHTML += `
-            <div class="mb-4">
-                <h4>Question ${index + 1}:</h4>
-                <p>${question.question}</p>
-                <ul class="list-group">
-                    ${question.options.map(option => `
-                        <li class="list-group-item ${option === userAnswer ? (isCorrect ? 'list-group-item-success' : 'list-group-item-danger') : ''}
-                                                    ${option === correctAnswer && !isCorrect ? 'list-group-item-success' : ''}">
-                            ${option}
-                            ${option === userAnswer ? ' (Your Answer)' : ''}
-                            ${option === correctAnswer ? ' (Correct Answer)' : ''}
-                        </li>
-                    `).join('')}
-                </ul>
-            </div>
-        `;
-    });
-    
-    quizContainer.innerHTML = resultsHTML;
-}
-
-// Load the first question when the page loads
-document.addEventListener('DOMContentLoaded', loadQuestion);
-</script>
+    {% endif %}
+</div>

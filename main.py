@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_wtf import FlaskForm
@@ -23,8 +23,6 @@ from openai import OpenAI
 
 
 APP_NAME = 'ENTER HERE'
-
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 ckeditor = CKEditor(app)
@@ -98,6 +96,7 @@ class NoteList(db.Model):
 class Quiz(db.Model):
     __tablename__ = "quizzes"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
     quiz_json: Mapped[str] = mapped_column(String())
 
 with app.app_context():
@@ -107,36 +106,34 @@ with app.app_context():
 def home_page():
     return render_template("index.html")
 
-@app.route('/quiz', methods=["GET", "POST"])
-def quiz():
-    form = NoteInput()
-    if form.validate_on_submit():
-        new_note = NoteList(
-            user_id=current_user.id,
-            class_name=form.class_name.data,
-            title=form.title.data,
-            content=form.content.data,
-        )
-        db.session.add(new_note)
-        db.session.commit()
+@app.route('/quiz/<int:note_id>', methods=["GET", "POST"])
+def quiz(note_id):
+    note = NoteList.query.get(note_id)
+    if not note:
+        return redirect(url_for('notes'))
+    # Check if the quiz generation button was clicked
+    if request.method == "POST":
+        # Create an OpenAI client
+        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         completion = client.chat.completions.create(
             model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a quiz generator assistant."},
-                {
-                    "role": "user",
-                    "content": f"Create a quiz based on the following notes. Output the quiz in JSON format:\n\n{form.content.data}"
-                }
-            ]
+        messages=[
+            {"role": "system", "content": "You are a quiz generator assistant."},
+            {
+                "role": "user",
+                "content": f"Create a quiz based on the following notes. Ignore any pictures or links. Output the quiz in JSON format:\n\n{note.content}"
+            }
+        ]
         )
         quiz_json = completion.choices[0].message.content
         new_quiz = Quiz(
+            user_id=current_user.id,
             quiz_json=quiz_json
         )
         db.session.add(new_quiz)
         db.session.commit()
-    quiz = Quiz.query.order_by(Quiz.id.desc()).first()
-    return render_template("quiz.html", quiz=quiz, form=form)
+    quiz = Quiz.query.filter_by(user_id=current_user.id).order_by(Quiz.id.desc()).first()
+    return render_template("quiz.html", quiz=quiz, note=note)
 
 @app.route('/notes', methods=["GET", "POST"])
 def notes():
