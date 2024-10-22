@@ -98,6 +98,9 @@ class Quiz(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
     quiz_json: Mapped[str] = mapped_column(String())
+    title: Mapped[str] = mapped_column(String())
+    class_name: Mapped[str] = mapped_column(String(250), unique=False, nullable=False)
+
 
 with app.app_context():
     db.create_all()
@@ -106,34 +109,52 @@ with app.app_context():
 def home_page():
     return render_template("index.html")
 
-@app.route('/quiz/<int:note_id>', methods=["GET", "POST"])
-def quiz(note_id):
-    note = NoteList.query.get(note_id)
-    if not note:
-        return redirect(url_for('notes'))
-    # Check if the quiz generation button was clicked
-    if request.method == "POST":
+@app.route('/quiz', methods=["GET", "POST"])
+def quiz():
+    form = NoteInput()
+    quiz_json = None
+    if form.validate_on_submit():
         # Create an OpenAI client
         client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         completion = client.chat.completions.create(
             model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are a quiz generator assistant."},
-            {
-                "role": "user",
-                "content": f"Create a quiz based on the following notes. Ignore any pictures or links. Output the quiz in JSON format:\n\n{note.content}"
-            }
-        ]
+            messages=[
+                {"role": "system", "content": "You are a quiz generator assistant."},
+                {
+                    "role": "user",
+                    "content": f"""Create a quiz based on the following notes. Ignore any pictures or links. Output the quiz in JSON format with the following structure:
+                    {{
+                        "title": "Quiz Title",
+                        "questions": [
+                            {{
+                                "question": "Question text",
+                                "options": ["Option A", "Option B", "Option C", "Option D"],
+                                "correct_answer": "Correct option letter (A, B, C, or D)",
+                                "explanation": "Explanation for the correct answer"
+                            }},
+                            // More questions...
+                        ]
+                    }}
+                    
+                    Here are the notes to base the quiz on:
+                    {form.content.data}"""
+                }
+            ]
         )
         quiz_json = completion.choices[0].message.content
         new_quiz = Quiz(
             user_id=current_user.id,
-            quiz_json=quiz_json
+            quiz_json=quiz_json,
+            title=form.title.data,
+            class_name=form.class_name.data,
         )
         db.session.add(new_quiz)
         db.session.commit()
-    quiz = Quiz.query.filter_by(user_id=current_user.id).order_by(Quiz.id.desc()).first()
-    return render_template("quiz.html", quiz=quiz, note=note)
+    quizzes = Quiz.query.filter_by(user_id=current_user.id).all()
+    selected_quiz = None
+    if request.args.get('quiz_id'):
+        selected_quiz = Quiz.query.get(request.args.get('quiz_id'))
+    return render_template("quiz.html", form=form, quizzes=quizzes, quiz_json=quiz_json, selected_quiz=selected_quiz)
 
 @app.route('/notes', methods=["GET", "POST"])
 def notes():

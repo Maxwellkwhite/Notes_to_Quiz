@@ -1,50 +1,93 @@
 {% include "header.html" %}
+{% block content %}
 <div class="container mt-5">
-    {% if quiz %}
-        <h1 class="mb-4">Quiz for: {{ note.title }}</h1>
-        <p class="mb-4">Based on your notes from: {{ note.class_name }}</p>
+    <div class="row">
+        <!-- Left side: Create New Quiz button and Previous Quizzes -->
+        <div class="col-md-4">
+            <!-- Button to trigger modal -->
+            <button type="button" class="btn btn-primary btn-lg btn-block mb-4" data-bs-toggle="modal" data-bs-target="#createQuizModal">
+                Create New Quiz
+            </button>
 
-        <div id="quiz-container">
-            {{ quiz.quiz_json | safe }}
+            <h4>Previous Quizzes</h4>
+            {% for quiz in quizzes %}
+                <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="btn btn-secondary btn-block mb-2 quiz-button" data-quiz-id="{{ quiz.id }}">{{ quiz.title }}</a>
+            {% endfor %}
         </div>
 
-        <!-- Commented out JavaScript for now
-        <script>
-            // let currentQuestion = 0;
-            // let questions = [];
-            // let userAnswers = [];
-
-            // // Parse the quiz JSON
-            // try {
-            //     questions = JSON.parse({{ quiz.quiz_json | tojson }});
-            // } catch (error) {
-            //     console.error("Error parsing quiz JSON:", error);
-            // }
-
-            // function displayQuestion() {
-            //     // ... (rest of the displayQuestion function)
-            // }
-
-            // function nextQuestion() {
-            //     // ... (rest of the nextQuestion function)
-            // }
-
-            // function submitQuiz() {
-            //     // ... (rest of the submitQuiz function)
-            // }
-
-            // // Initial display
-            // displayQuestion();
-
-            // // Add event listener to submit button
-            // document.getElementById('submit-quiz').addEventListener('click', submitQuiz);
-        </script>
-        -->
-    {% else %}
-        <p>No quiz available. Please generate a quiz first.</p>
-        <form method="POST">
-            <input type="hidden" name="generate_quiz" value="true">
-            <button type="submit" class="btn btn-primary">Generate Quiz</button>
-        </form>
-    {% endif %}
+        <!-- Right side: Generated or Selected Quiz -->
+        <div class="col-md-8" id="quizContent">
+            {% if quiz_json %}
+                <h3>Generated Quiz</h3>
+                <pre>{{ quiz_json }}</pre>
+            {% elif selected_quiz %}
+                <h3>{{ selected_quiz.title }}</h3>
+                <pre>{{ selected_quiz.quiz_json }}</pre>
+            {% else %}
+                <p>No quiz has been generated yet. Please create a new quiz or select a previous quiz.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="createQuizModal" tabindex="-1" aria-labelledby="createQuizModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createQuizModalLabel">Create Quiz from Notes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('quiz') }}" id="quizForm">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.class_name.label(class="form-label") }}
+                        {{ form.class_name(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.content.label(class="form-label") }}
+                        {{ form.content(class="form-control") }}
+                        {{ ckeditor.load() }}
+                        {{ ckeditor.config(name='content') }}
+                    </div>
+                    {{ form.submit(class="btn btn-primary", value="Generate Quiz") }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+
+    document.getElementById('quizForm').addEventListener('submit', function() {
+        setTimeout(function() {
+            window.history.replaceState(null, null, window.location.href);
+        }, 0);
+    });
+
+    // Add event listeners to previous quiz buttons
+    document.querySelectorAll('.quiz-button').forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const quizId = this.getAttribute('data-quiz-id');
+            fetch(`{{ url_for('quiz') }}?quiz_id=${quizId}`)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newQuizContent = doc.querySelector('#quizContent').innerHTML;
+                    document.querySelector('#quizContent').innerHTML = newQuizContent;
+                });
+        });
+    });
+</script>
+
+{% endblock %}
