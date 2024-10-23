@@ -5,7 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, PasswordField
 from wtforms.validators import DataRequired, Email
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Date
+from sqlalchemy import Integer, String, Date, JSON
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -97,7 +97,7 @@ class Quiz(db.Model):
     __tablename__ = "quizzes"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
-    quiz_json: Mapped[str] = mapped_column(String())
+    quiz_json: Mapped[str] = mapped_column(JSON())
     title: Mapped[str] = mapped_column(String())
     class_name: Mapped[str] = mapped_column(String(250), unique=False, nullable=False)
 
@@ -129,7 +129,7 @@ def quiz():
                             {{
                                 "question": "Question text",
                                 "options": ["Option A", "Option B", "Option C", "Option D"],
-                                "correct_answer": "Correct option letter (A, B, C, or D)",
+                                "correct_answer": "Correct option",
                                 "explanation": "Explanation for the correct answer"
                             }},
                             // More questions...
@@ -141,7 +141,7 @@ def quiz():
                 }
             ]
         )
-        quiz_json = completion.choices[0].message.content
+        quiz_json = json.loads(completion.choices[0].message.content)
         new_quiz = Quiz(
             user_id=current_user.id,
             quiz_json=quiz_json,
@@ -150,10 +150,13 @@ def quiz():
         )
         db.session.add(new_quiz)
         db.session.commit()
+    # Check the type of quiz_json
     quizzes = Quiz.query.filter_by(user_id=current_user.id).all()
     selected_quiz = None
     if request.args.get('quiz_id'):
         selected_quiz = Quiz.query.get(request.args.get('quiz_id'))
+    
+    #need to add notes to note db
     return render_template("quiz.html", form=form, quizzes=quizzes, quiz_json=quiz_json, selected_quiz=selected_quiz)
 
 @app.route('/notes', methods=["GET", "POST"])
@@ -174,6 +177,7 @@ def notes():
     # Get notes for the current user
     user_notes = NoteList.query.filter_by(user_id=current_user.id).all()
     return render_template("notes.html", form=form, notes=user_notes)
+
 
 @app.route('/register', methods=["GET", "POST"])
 def register():

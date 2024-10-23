@@ -1,34 +1,122 @@
 {% include "header.html" %}
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <!-- Left side: Create New Quiz button and Previous Quizzes -->
-        <div class="col-md-4">
-            <!-- Button to trigger modal -->
-            <button type="button" class="btn btn-primary btn-lg btn-block mb-4" data-bs-toggle="modal" data-bs-target="#createQuizModal">
-                Create New Quiz
-            </button>
+<!-- Button to trigger modal -->
+<div class="row">
+    <div class="col-md-3">
+        <button type="button" class="btn btn-primary btn-lg btn-block mb-4" data-bs-toggle="modal" data-bs-target="#createQuizModal">
+            Create New Quiz
+        </button>
 
-            <h4>Previous Quizzes</h4>
-            {% for quiz in quizzes %}
-                <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="btn btn-secondary btn-block mb-2 quiz-button" data-quiz-id="{{ quiz.id }}">{{ quiz.title }}</a>
-            {% endfor %}
+        <h4>Previous Quizzes</h4>
+        {% for quiz in quizzes %}
+            <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="btn btn-secondary btn-block mb-2 quiz-button" data-quiz-id="{{ quiz.id }}">{{ quiz.title }}</a>
+        {% endfor %}
+    </div>
+    <div class="col-md-9">
+        <!-- Display selected quiz -->
+        {% if selected_quiz %}
+        <div id="quizContainer" class="mt-4">
+            <h2>{{ selected_quiz.title }}</h2>
+            <div id="questionContainer"></div>
+            <button type="button" class="btn btn-primary" id="nextQuestion" style="display: none;">Next Question</button>
+            <button type="button" class="btn btn-primary" id="finishQuiz" style="display: none;">Finish Quiz</button>
         </div>
-
-        <!-- Right side: Generated or Selected Quiz -->
-        <div class="col-md-8" id="quizContent">
-            {% if quiz_json %}
-                <h3>Generated Quiz</h3>
-                <pre>{{ quiz_json }}</pre>
-            {% elif selected_quiz %}
-                <h3>{{ selected_quiz.title }}</h3>
-                <pre>{{ selected_quiz.quiz_json }}</pre>
-            {% else %}
-                <p>No quiz has been generated yet. Please create a new quiz or select a previous quiz.</p>
-            {% endif %}
+        {% elif quiz_json %}
+        <div id="quizContainer" class="mt-4">
+            <h2>{{ quiz_json['title'] }}</h2>
+            <div id="questionContainer"></div>
+            <button type="button" class="btn btn-primary" id="nextQuestion" style="display: none;">Next Question</button>
+            <button type="button" class="btn btn-primary" id="finishQuiz" style="display: none;">Finish Quiz</button>
         </div>
+        {% else %}
+        <div class="mt-4">
+            <h2>Select a quiz from the left or create a new one</h2>
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<script>
+let currentQuestionIndex = 0;
+let quizData = {{ selected_quiz.quiz_json['questions'] | tojson if selected_quiz else quiz_json['questions'] | tojson }};
+
+function displayQuestion(index) {
+    const questionContainer = document.getElementById('questionContainer');
+    const question = quizData[index];
+    
+    let html = `
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">${question['question']}</h5>
+                ${question['options'].map((option, i) => `
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question" id="option${i}" value="${option}">
+                        <label class="form-check-label" for="option${i}">${option}</label>
+                    </div>
+                `).join('')}
+                <div class="mt-2 feedback" style="display: none;">
+                    <p class="correct-answer" style="display: none; color: green;">Correct!</p>
+                    <p class="wrong-answer" style="display: none; color: red;">Incorrect. The correct answer is: <span class="correct-answer-text"></span></p>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-primary" id="submitAnswer">Submit Answer</button>
+    `;
+    
+    questionContainer.innerHTML = html;
+    
+    document.getElementById('submitAnswer').addEventListener('click', checkAnswer);
+}
+
+function checkAnswer() {
+    const selectedOption = document.querySelector('input[name="question"]:checked');
+    const feedback = document.querySelector('.feedback');
+    const correctFeedback = feedback.querySelector('.correct-answer');
+    const wrongFeedback = feedback.querySelector('.wrong-answer');
+    const correctAnswerText = feedback.querySelector('.correct-answer-text');
+    
+    feedback.style.display = 'block';
+    
+    if (selectedOption) {
+        const correctAnswer = quizData[currentQuestionIndex]['correct_answer'];
+        correctAnswerText.textContent = correctAnswer;
+        
+        if (selectedOption.value === correctAnswer) {
+            correctFeedback.style.display = 'block';
+            wrongFeedback.style.display = 'none';
+        } else {
+            correctFeedback.style.display = 'none';
+            wrongFeedback.style.display = 'block';
+        }
+        
+        document.getElementById('submitAnswer').style.display = 'none';
+        if (currentQuestionIndex < quizData.length - 1) {
+            document.getElementById('nextQuestion').style.display = 'block';
+        } else {
+            document.getElementById('finishQuiz').style.display = 'block';
+        }
+    } else {
+        alert('Please select an answer.');
+    }
+}
+
+document.getElementById('nextQuestion').addEventListener('click', () => {
+    currentQuestionIndex++;
+    displayQuestion(currentQuestionIndex);
+    document.getElementById('nextQuestion').style.display = 'none';
+});
+
+document.getElementById('finishQuiz').addEventListener('click', () => {
+    alert('Quiz completed!');
+    // You can add more functionality here, like showing a summary or redirecting
+});
+
+// Start the quiz
+if (quizData && quizData.length > 0) {
+    displayQuestion(currentQuestionIndex);
+}
+</script>
+
 
 <!-- Modal -->
 <div class="modal fade" id="createQuizModal" tabindex="-1" aria-labelledby="createQuizModalLabel" aria-hidden="true">
@@ -61,33 +149,5 @@
         </div>
     </div>
 </div>
-
-<script>
-    if (window.history.replaceState) {
-        window.history.replaceState(null, null, window.location.href);
-    }
-
-    document.getElementById('quizForm').addEventListener('submit', function() {
-        setTimeout(function() {
-            window.history.replaceState(null, null, window.location.href);
-        }, 0);
-    });
-
-    // Add event listeners to previous quiz buttons
-    document.querySelectorAll('.quiz-button').forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const quizId = this.getAttribute('data-quiz-id');
-            fetch(`{{ url_for('quiz') }}?quiz_id=${quizId}`)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newQuizContent = doc.querySelector('#quizContent').innerHTML;
-                    document.querySelector('#quizContent').innerHTML = newQuizContent;
-                });
-        });
-    });
-</script>
 
 {% endblock %}
