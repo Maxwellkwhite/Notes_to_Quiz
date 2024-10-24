@@ -168,7 +168,7 @@ def update_best_score(quiz_id):
             completed_update = db.session.execute(db.select(Quiz).where(Quiz.id == quiz_id)).scalar()
             old_best_score = int(completed_update.best_score)
             new_best_score = int(request.form.get("best_score"))
-            if new_best_score > old_best_score:
+            if old_best_score == 0 or new_best_score > old_best_score:
                 completed_update.best_score = new_best_score
                 db.session.commit()
     return redirect(url_for('quiz'))

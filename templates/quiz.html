@@ -115,7 +115,7 @@ document.getElementById('finishQuiz').addEventListener('click', () => {
     const score = correctAnswersCount;
     
     // Update the best score in the database
-    fetch('{{ url_for("update_best_score", quiz_id=selected_quiz.id if selected_quiz else quiz_json.id) }}', {
+    fetch('{{ url_for("update_best_score", quiz_id=selected_quiz.id if selected_quiz else quizzes.id) }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
