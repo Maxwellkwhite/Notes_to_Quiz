@@ -112,16 +112,16 @@ document.getElementById('nextQuestion').addEventListener('click', () => {
 
 document.getElementById('finishQuiz').addEventListener('click', () => {
     const totalQuestions = quizData.length;
-    const score = `${correctAnswersCount}/${totalQuestions}`;
+    const score = correctAnswersCount;
     
     // Update the best score in the database
-    fetch('{{ url_for("update_best_score", quiz_id=selected_quiz.id if selected_quiz else "new", score=score) }}', {
+    fetch('{{ url_for("update_best_score", quiz_id=selected_quiz.id if selected_quiz else quiz_json.id) }}', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
             'X-CSRFToken': '{{ form.csrf_token._value() }}'
         },
-        body: JSON.stringify({ score: score })
+        body: `best_score=${score}`
     }).then(response => {
         if (response.ok) {
             console.log('Best score updated successfully');
@@ -132,7 +132,7 @@ document.getElementById('finishQuiz').addEventListener('click', () => {
     
     // Display the final score
     const questionContainer = document.getElementById('questionContainer');
-    questionContainer.innerHTML = `<h3>Your final score is ${score}</h3>`;
+    questionContainer.innerHTML = `<h3>Your final score is ${score}/${totalQuestions}</h3>`;
     document.getElementById('finishQuiz').style.display = 'none';
 });
 

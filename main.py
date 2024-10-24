@@ -163,10 +163,14 @@ def quiz():
 
 @app.route('/update_best_score/<quiz_id>', methods=["GET", "POST"])
 def update_best_score(quiz_id):
-    if quiz_id:
-        selected_quiz = Quiz.query.get(quiz_id)
-        selected_quiz.best_score = request.args.get('best_score')
-        db.session.commit()
+    if request.method == "POST":
+        with app.app_context():
+            completed_update = db.session.execute(db.select(Quiz).where(Quiz.id == quiz_id)).scalar()
+            old_best_score = int(completed_update.best_score)
+            new_best_score = int(request.form.get("best_score"))
+            if new_best_score > old_best_score:
+                completed_update.best_score = new_best_score
+                db.session.commit()
     return redirect(url_for('quiz'))
 
 
