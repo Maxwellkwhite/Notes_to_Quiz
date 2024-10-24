@@ -39,6 +39,7 @@
 
 <script>
 let currentQuestionIndex = 0;
+let correctAnswersCount = 0;
 let quizData = {% if selected_quiz or quiz_json %}{{ selected_quiz.quiz_json['questions'] | tojson if selected_quiz else quiz_json['questions'] | tojson }}{% else %}null{% endif %};
 
 function displayQuestion(index) {
@@ -49,6 +50,7 @@ function displayQuestion(index) {
         <div class="card mb-3">
             <div class="card-body">
                 <h5 class="card-title">${question['question']}</h5>
+                <p>Question ${index + 1} of ${quizData.length}</p>
                 ${question['options'].map((option, i) => `
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="question" id="option${i}" value="${option}">
@@ -85,6 +87,7 @@ function checkAnswer() {
         if (selectedOption.value === correctAnswer) {
             correctFeedback.style.display = 'block';
             wrongFeedback.style.display = 'none';
+            correctAnswersCount++;
         } else {
             correctFeedback.style.display = 'none';
             wrongFeedback.style.display = 'block';
@@ -108,8 +111,29 @@ document.getElementById('nextQuestion').addEventListener('click', () => {
 });
 
 document.getElementById('finishQuiz').addEventListener('click', () => {
-    alert('Quiz completed!');
-    // You can add more functionality here, like showing a summary or redirecting
+    const totalQuestions = quizData.length;
+    const score = `${correctAnswersCount}/${totalQuestions}`;
+    
+    // Update the best score in the database
+    fetch('{{ url_for("update_best_score", quiz_id=selected_quiz.id if selected_quiz else "new", score=score) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ form.csrf_token._value() }}'
+        },
+        body: JSON.stringify({ score: score })
+    }).then(response => {
+        if (response.ok) {
+            console.log('Best score updated successfully');
+        } else {
+            console.error('Failed to update best score');
+        }
+    });
+    
+    // Display the final score
+    const questionContainer = document.getElementById('questionContainer');
+    questionContainer.innerHTML = `<h3>Your final score is ${score}</h3>`;
+    document.getElementById('finishQuiz').style.display = 'none';
 });
 
 // Start the quiz
@@ -146,9 +170,40 @@ if (quizData && quizData.length > 0) {
                     </div>
                     {{ form.submit(class="btn btn-primary", value="Generate Quiz") }}
                 </form>
+                <div id="loadingSpinner" class="spinner-border text-primary" role="status" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+let quizSubmitted = false;
+
+document.getElementById('quizForm').addEventListener('submit', function(event) {
+    if (quizSubmitted) {
+        event.preventDefault();
+        return;
+    }
+    
+    quizSubmitted = true;
+    document.getElementById('loadingSpinner').style.display = 'block';
+});
+
+document.getElementById('createQuizModal').addEventListener('hidden.bs.modal', function () {
+    if (quizSubmitted) {
+        document.getElementById('quizForm').reset();
+        document.getElementById('loadingSpinner').style.display = 'none';
+        quizSubmitted = false;
+    }
+});
+</script>
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+
 
 {% endblock %}

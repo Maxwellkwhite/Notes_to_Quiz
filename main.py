@@ -100,6 +100,7 @@ class Quiz(db.Model):
     quiz_json: Mapped[str] = mapped_column(JSON())
     title: Mapped[str] = mapped_column(String())
     class_name: Mapped[str] = mapped_column(String(250), unique=False, nullable=False)
+    best_score: Mapped[int] = mapped_column(Integer)
 
 
 with app.app_context():
@@ -147,6 +148,7 @@ def quiz():
             quiz_json=quiz_json,
             title=form.title.data,
             class_name=form.class_name.data,
+            best_score=0,
         )
         db.session.add(new_quiz)
         db.session.commit()
@@ -158,6 +160,15 @@ def quiz():
     
     #need to add notes to note db
     return render_template("quiz.html", form=form, quizzes=quizzes, quiz_json=quiz_json, selected_quiz=selected_quiz)
+
+@app.route('/update_best_score/<quiz_id>', methods=["GET", "POST"])
+def update_best_score(quiz_id):
+    if quiz_id:
+        selected_quiz = Quiz.query.get(quiz_id)
+        selected_quiz.best_score = request.args.get('best_score')
+        db.session.commit()
+    return redirect(url_for('quiz'))
+
 
 @app.route('/notes', methods=["GET", "POST"])
 def notes():
@@ -341,5 +352,11 @@ def feedback():
         flash('Feedback received! Thank you for taking the time to help.')
     return render_template("feedback.html", form=form)
 
+
 if __name__ == "__main__":
     app.run(debug=True, port=5002)
+
+
+
+
+
