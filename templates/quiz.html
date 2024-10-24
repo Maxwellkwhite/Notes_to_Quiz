@@ -39,7 +39,7 @@
 
 <script>
 let currentQuestionIndex = 0;
-let quizData = {{ selected_quiz.quiz_json['questions'] | tojson if selected_quiz else quiz_json['questions'] | tojson }};
+let quizData = {% if selected_quiz or quiz_json %}{{ selected_quiz.quiz_json['questions'] | tojson if selected_quiz else quiz_json['questions'] | tojson }}{% else %}null{% endif %};
 
 function displayQuestion(index) {
     const questionContainer = document.getElementById('questionContainer');
