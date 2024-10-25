@@ -3,35 +3,58 @@
 <!-- Button to trigger modal -->
 <div class="row">
     <div class="col-md-3">
-        <button type="button" class="btn btn-primary btn-lg btn-block mb-4" data-bs-toggle="modal" data-bs-target="#createQuizModal">
-            Create New Quiz
-        </button>
+        <nav id="sidebar" class="bg-light shadow rounded">
+            <div class="position-sticky p-4">
+                <button type="button" class="btn btn-primary btn-lg btn-block mb-4 w-100 shadow-sm" data-bs-toggle="modal" data-bs-target="#createQuizModal">
+                    <i class="fas fa-plus-circle me-2"></i>Create New Quiz
+                </button>
 
-        <h4>Previous Quizzes</h4>
-        {% for quiz in quizzes %}
-            <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="btn btn-secondary btn-block mb-2 quiz-button" data-quiz-id="{{ quiz.id }}">{{ quiz.title }}</a>
-        {% endfor %}
+                <h4 class="text-primary mb-3"><i class="fas fa-history me-2"></i>Previous Quizzes</h4>
+                <div class="nav flex-column">
+                    {% set classes = quizzes | groupby('class_name') %}
+                    {% for class_name, class_quizzes in classes %}
+                        <div class="mb-2">
+                            <button class="btn btn-outline-primary w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
+                                <i class="fas fa-graduation-cap me-2"></i>{{ class_name }}
+                            </button>
+                            <div class="collapse" id="collapse{{ loop.index }}">
+                                {% for quiz in class_quizzes %}
+                                    <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="nav-link btn btn-outline-secondary mt-1 quiz-button text-start" data-quiz-id="{{ quiz.id }}">
+                                        <i class="fas fa-file-alt me-2"></i>{{ quiz.title }}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <h4 class="text-success mt-4 mb-3"><i class="fas fa-star me-2"></i>New Quiz</h4>
+                {% if quizzes %}
+                    {% set newest_quiz = quizzes|sort(attribute='id', reverse=true)|first %}
+                    <a href="{{ url_for('quiz', quiz_id=newest_quiz.id) }}" class="nav-link btn btn-outline-success mb-2 quiz-button text-start" data-quiz-id="{{ newest_quiz.id }}">
+                        <i class="fas fa-certificate me-2"></i>{{ newest_quiz.title }}
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
     </div>
     
     <div class="col-md-9">
         <!-- Display selected quiz -->
         {% if selected_quiz %}
-        <div id="quizContainer" class="mt-4">
-            <h2>{{ selected_quiz.title }}</h2>
-            <div id="questionContainer"></div>
-            <button type="button" class="btn btn-primary" id="nextQuestion" style="display: none;">Next Question</button>
-            <button type="button" class="btn btn-primary" id="finishQuiz" style="display: none;">Finish Quiz</button>
-        </div>
-        {% elif quiz_json %}
-        <div id="quizContainer" class="mt-4">
-            <h2>{{ quiz_json['title'] }}</h2>
-            <div id="questionContainer"></div>
-            <button type="button" class="btn btn-primary" id="nextQuestion" style="display: none;">Next Question</button>
-            <button type="button" class="btn btn-primary" id="finishQuiz" style="display: none;">Finish Quiz</button>
+        <div id="quizContainer" class="mt-4 bg-light shadow rounded p-4">
+            <h2 class="text-primary mb-4"><i class="fas fa-question-circle me-2"></i>{{ selected_quiz.title }}</h2>
+            <div id="questionContainer" class="mb-4"></div>
+            <button type="button" class="btn btn-primary shadow-sm" id="nextQuestion" style="display: none;">
+                <i class="fas fa-arrow-right me-2"></i>Next Question
+            </button>
+            <button type="button" class="btn btn-success shadow-sm" id="finishQuiz" style="display: none;">
+                <i class="fas fa-check-circle me-2"></i>Finish Quiz
+            </button>
         </div>
         {% else %}
-        <div class="mt-4">
-            <h2>Select a quiz from the left or create a new one</h2>
+        <div class="mt-4 bg-light shadow rounded p-4">
+            <h2 class="text-primary"><i class="fas fa-info-circle me-2"></i>Select a quiz from the left or create a new one</h2>
         </div>
         {% endif %}
     </div>
@@ -40,30 +63,32 @@
 <script>
 let currentQuestionIndex = 0;
 let correctAnswersCount = 0;
-let quizData = {% if selected_quiz or quiz_json %}{{ selected_quiz.quiz_json['questions'] | tojson if selected_quiz else quiz_json['questions'] | tojson }}{% else %}null{% endif %};
+let quizData = {% if selected_quiz %}{{ selected_quiz.quiz_json['questions'] | tojson }}{% else %}null{% endif %};
 
 function displayQuestion(index) {
     const questionContainer = document.getElementById('questionContainer');
     const question = quizData[index];
     
     let html = `
-        <div class="card mb-3">
+        <div class="card mb-3 shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">${question['question']}</h5>
-                <p>Question ${index + 1} of ${quizData.length}</p>
+                <h5 class="card-title text-primary"><i class="fas fa-question me-2"></i>${question['question']}</h5>
+                <p class="text-muted"><i class="fas fa-list-ol me-2"></i>Question ${index + 1} of ${quizData.length}</p>
                 ${question['options'].map((option, i) => `
-                    <div class="form-check">
+                    <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="question" id="option${i}" value="${option}">
                         <label class="form-check-label" for="option${i}">${option}</label>
                     </div>
                 `).join('')}
-                <div class="mt-2 feedback" style="display: none;">
-                    <p class="correct-answer" style="display: none; color: green;">Correct!</p>
-                    <p class="wrong-answer" style="display: none; color: red;">Incorrect. The correct answer is: <span class="correct-answer-text"></span></p>
+                <div class="mt-3 feedback" style="display: none;">
+                    <p class="correct-answer alert alert-success" style="display: none;"><i class="fas fa-check-circle me-2"></i>Correct!</p>
+                    <p class="wrong-answer alert alert-danger" style="display: none;"><i class="fas fa-times-circle me-2"></i>Incorrect. The correct answer is: <span class="correct-answer-text"></span></p>
                 </div>
             </div>
         </div>
-        <button type="button" class="btn btn-primary" id="submitAnswer">Submit Answer</button>
+        <button type="button" class="btn btn-primary shadow-sm" id="submitAnswer">
+            <i class="fas fa-paper-plane me-2"></i>Submit Answer
+        </button>
     `;
     
     questionContainer.innerHTML = html;
@@ -115,7 +140,7 @@ document.getElementById('finishQuiz').addEventListener('click', () => {
     const score = correctAnswersCount;
     
     // Update the best score in the database
-    fetch('{{ url_for("update_best_score", quiz_id=selected_quiz.id if selected_quiz else quizzes.id) }}', {
+    fetch('{{ url_for("update_best_score", quiz_id=selected_quiz.id if selected_quiz else "") }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -132,11 +157,22 @@ document.getElementById('finishQuiz').addEventListener('click', () => {
     
     // Display the final score
     const questionContainer = document.getElementById('questionContainer');
-    questionContainer.innerHTML = `<h3>Your final score is ${score}/${totalQuestions}</h3>`;
+    const bestScore = {{ selected_quiz.best_score if selected_quiz else 0 }};
+    let scoreMessage = `<h3 class="text-primary mb-3"><i class="fas fa-trophy me-2"></i>Your final score is ${score}/${totalQuestions} (${Math.round((score / totalQuestions) * 100)}%)</h3>`;
+    if (score > bestScore) {
+        scoreMessage += `<h4 class="text-success"><i class="fas fa-star me-2"></i>You set a new high score of ${score}/${totalQuestions} correct!</h4>`;
+    }
+    if (score < bestScore) {
+        scoreMessage += `<h4 class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>You did not beat your best score of ${bestScore}/${totalQuestions}!</h4>`;
+    }
+    if (score == bestScore) {
+        scoreMessage += `<h4 class="text-info"><i class="fas fa-equals me-2"></i>You matched your best score of ${bestScore}/${totalQuestions}!</h4>`;
+    }
+    questionContainer.innerHTML = `<div class="alert alert-info">${scoreMessage}</div>`;
     document.getElementById('finishQuiz').style.display = 'none';
 });
 
-// Start the quiz
+// Start the quiz if a quiz is selected
 if (quizData && quizData.length > 0) {
     displayQuestion(currentQuestionIndex);
 }
@@ -170,7 +206,7 @@ if (quizData && quizData.length > 0) {
                     </div>
                     {{ form.submit(class="btn btn-primary", value="Generate Quiz") }}
                 </form>
-                <div id="loadingSpinner" class="spinner-border text-primary" role="status" style="display: none;">
+                <div id="loadingSpinner" class="spinner-grow text-primary position-absolute top-50 start-50 translate-middle" role="status" style="display: none;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>

@@ -100,8 +100,8 @@ class Quiz(db.Model):
     quiz_json: Mapped[str] = mapped_column(JSON())
     title: Mapped[str] = mapped_column(String())
     class_name: Mapped[str] = mapped_column(String(250), unique=False, nullable=False)
+    total_questions: Mapped[int] = mapped_column(Integer)
     best_score: Mapped[int] = mapped_column(Integer)
-
 
 with app.app_context():
     db.create_all()
@@ -115,6 +115,15 @@ def quiz():
     form = NoteInput()
     quiz_json = None
     if form.validate_on_submit():
+        # Save notes to the database
+        new_note = NoteList(
+            user_id=current_user.id,
+            class_name=form.class_name.data,
+            title=form.title.data,
+            content=form.content.data
+        )
+        db.session.add(new_note)
+        db.session.commit()
         # Create an OpenAI client
         client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         completion = client.chat.completions.create(
@@ -149,17 +158,19 @@ def quiz():
             title=form.title.data,
             class_name=form.class_name.data,
             best_score=0,
+            total_questions=len(quiz_json["questions"]),
         )
         db.session.add(new_quiz)
         db.session.commit()
     # Check the type of quiz_json
     quizzes = Quiz.query.filter_by(user_id=current_user.id).all()
+    newest_quiz = quizzes[-1] if quizzes else None
     selected_quiz = None
     if request.args.get('quiz_id'):
         selected_quiz = Quiz.query.get(request.args.get('quiz_id'))
     
     #need to add notes to note db
-    return render_template("quiz.html", form=form, quizzes=quizzes, quiz_json=quiz_json, selected_quiz=selected_quiz)
+    return render_template("quiz.html", form=form, quizzes=quizzes, newest_quiz=newest_quiz, selected_quiz=selected_quiz)
 
 @app.route('/update_best_score/<quiz_id>', methods=["GET", "POST"])
 def update_best_score(quiz_id):
@@ -246,7 +257,7 @@ def login():
             return redirect(url_for('login'))
         else:
             login_user(user)
-            return redirect(url_for('INSERT HERE'))
+            return redirect(url_for('quiz'))
 
     return render_template("login.html", form=form, current_user=current_user)
 
