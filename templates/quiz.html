@@ -5,16 +5,27 @@
     <div class="col-md-3">
         <nav id="sidebar" class="bg-light shadow rounded">
             <div class="position-sticky p-4">
-                <button type="button" class="btn btn-primary btn-lg btn-block mb-4 w-100 shadow-sm" data-bs-toggle="modal" data-bs-target="#createQuizModal">
-                    <i class="fas fa-plus-circle me-2"></i>Create New Quiz
+                <button type="button" class="create_quiz_button" data-bs-toggle="modal" data-bs-target="#createQuizModal">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                        ></path>
+                      </svg>
+                      <span class="text">Create New Quiz</span>
+                      <span class="circle"></span>
+                      <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                        ></path>
+                      </svg>
                 </button>
 
-                <h4 class="text-primary mb-3"><i class="fas fa-history me-2"></i>Previous Quizzes</h4>
                 <div class="nav flex-column">
                     {% set classes = quizzes | groupby('class_name') %}
                     {% for class_name, class_quizzes in classes %}
                         <div class="mb-2">
-                            <button class="btn btn-outline-primary w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
+                            <button class="btn btn-outline-primary class_button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
                                 <i class="fas fa-graduation-cap me-2"></i>{{ class_name }}
                             </button>
                             <div class="collapse" id="collapse{{ loop.index }}">

@@ -1,0 +1,165 @@
+:root {
+  /* Primary colors */
+  --primary-color: #F9F7F7;
+  --secondary-color: #DBE2EF;
+  --tertiary-color: #3F72AF;
+  --quaternary-color: #112D4E;
+}
+body {
+    background-color: var(--quaternary-color);
+}
+
+/* Create Quiz Button */
+.create_quiz_button {
+    /* Base button styles */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 16px 36px;
+    border: 4px solid transparent;
+    font-size: 16px;
+    background-color: inherit;
+    border-radius: 100px;
+    font-weight: 600;
+    color: var(--tertiary-color);
+    box-shadow: 0 0 0 2px var(--tertiary-color);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    margin: 0 auto;
+    margin-bottom: 20px; /* Added bottom margin */
+    width: fit-content;
+
+    /* Child element styles */
+    & svg {
+        position: absolute;
+        width: 24px;
+        fill: var(--tertiary-color);
+        z-index: 9;
+        transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    & .arr-1 { right: 16px; }
+    & .arr-2 { left: -25%; }
+
+    & .circle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 20px;
+        height: 20px;
+        background-color: var(--tertiary-color);
+        border-radius: 50%;
+        opacity: 0;
+        transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    & .text {
+        position: relative;
+        z-index: 1;
+        transform: translateX(-12px);
+        transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    /* Hover states */
+    &:hover {
+        box-shadow: 0 0 0 12px transparent;
+        color: var(--primary-color);
+        border-radius: 12px;
+
+        & .arr-1 { right: -25%; }
+        & .arr-2 { left: 16px; }
+        & .text { transform: translateX(12px); }
+        & svg { fill: var(--primary-color); }
+        & .circle {
+            width: 220px;
+            height: 220px;
+            opacity: 1;
+        }
+    }
+
+    /* Active state */
+    &:active {
+        scale: 0.95;
+        box-shadow: 0 0 0 4px var(--tertiary-color);
+    }
+}
+
+/* Sidebar */
+#sidebar {
+    background-color: var(--primary-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0 !important; /* Remove rounded edges */
+
+    .nav-link {
+        color: var(--quaternary-color);
+        margin: 0.25rem 0;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+
+        &:hover, &:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+    }
+
+    .btn-outline-primary,
+    .btn-outline-secondary,
+    .btn-outline-success.class_button {
+        border-width: 1px;
+        margin: 0.25rem 0;
+        transition: all 0.2s ease;
+        color: var(--quaternary-color);
+        border-color: var(--quaternary-color);
+
+        &:hover, &:focus {
+            background-color: var(--tertiary-color);
+            color: white;
+            border-color: var(--tertiary-color);
+        }
+    }
+
+    .text-primary, .text-success {
+        font-size: 1.2em;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .text-primary {
+        color: var(--quaternary-color) !important;
+    }
+
+    .text-success {
+        color: var(--tertiary-color) !important;
+    }
+
+    .btn-outline-primary {
+        width: 100%;
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        
+        &:hover, &:focus, &[aria-expanded="true"] {
+            background-color: var(--tertiary-color);
+            color: white;
+            border-color: var(--tertiary-color);
+        }
+    }
+
+    .collapse {
+        .nav-link {
+            padding-left: 1.5rem;
+            font-size: 0.9em;
+        }
+    }
+    .fas.fa-chevron-down {
+        color: black;
+    }
+}
