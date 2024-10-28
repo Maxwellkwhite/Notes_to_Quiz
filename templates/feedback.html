@@ -31,7 +31,7 @@
                 </div>
                 <div class="card-body">
                     {% if feedback_list %}
-                        {% for feedback in feedback_list %}
+                        {% for feedback in feedback_list|sort(attribute='upvote_count', reverse=True) %}
                             <div class="card mb-3">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ feedback.title }}</h5>

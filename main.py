@@ -255,7 +255,7 @@ def register():
         db.session.commit()
         # This line will authenticate the user with Flask-Login
         login_user(new_user)
-        return redirect(url_for("notes"))
+        return redirect(url_for("quiz"))
     return render_template("register.html", form=form, current_user=current_user)
 
 @app.route('/login', methods=["GET", "POST"])
