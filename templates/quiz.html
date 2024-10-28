@@ -51,6 +51,9 @@
             <button type="button" class="btn btn-success shadow-sm" id="finishQuiz" style="display: none;">
                 <i class="fas fa-check-circle me-2"></i>Finish Quiz
             </button>
+            <button type="button" class="btn btn-info shadow-sm" id="refreshPage" style="display: none;">
+                <i class="fas fa-sync-alt me-2"></i>Retry Quiz
+            </button>
         </div>
         {% else %}
         <div class="mt-4 bg-light shadow rounded p-4">
@@ -76,7 +79,7 @@ function displayQuestion(index) {
                 <p class="text-muted"><i class="fas fa-list-ol me-2"></i>Question ${index + 1} of ${quizData.length}</p>
                 ${question['options'].map((option, i) => `
                     <div class="form-check mb-2">
-                        <input class="form-check-input" type="radio" name="question" id="option${i}" value="${option}">
+                        <input class="form-check-input" type="radio" name="question" id="option${i}" value="${option}" onchange="checkAnswer()">
                         <label class="form-check-label" for="option${i}">${option}</label>
                     </div>
                 `).join('')}
@@ -86,14 +89,9 @@ function displayQuestion(index) {
                 </div>
             </div>
         </div>
-        <button type="button" class="btn btn-primary shadow-sm" id="submitAnswer">
-            <i class="fas fa-paper-plane me-2"></i>Submit Answer
-        </button>
     `;
     
     questionContainer.innerHTML = html;
-    
-    document.getElementById('submitAnswer').addEventListener('click', checkAnswer);
 }
 
 function checkAnswer() {
@@ -118,14 +116,16 @@ function checkAnswer() {
             wrongFeedback.style.display = 'block';
         }
         
-        document.getElementById('submitAnswer').style.display = 'none';
         if (currentQuestionIndex < quizData.length - 1) {
             document.getElementById('nextQuestion').style.display = 'block';
         } else {
             document.getElementById('finishQuiz').style.display = 'block';
         }
-    } else {
-        alert('Please select an answer.');
+        
+        // Disable all radio buttons after an answer is selected
+        document.querySelectorAll('input[name="question"]').forEach(input => {
+            input.disabled = true;
+        });
     }
 }
 
@@ -170,6 +170,11 @@ document.getElementById('finishQuiz').addEventListener('click', () => {
     }
     questionContainer.innerHTML = `<div class="alert alert-info">${scoreMessage}</div>`;
     document.getElementById('finishQuiz').style.display = 'none';
+    document.getElementById('refreshPage').style.display = 'block';
+});
+
+document.getElementById('refreshPage').addEventListener('click', () => {
+    location.reload();
 });
 
 // Start the quiz if a quiz is selected
