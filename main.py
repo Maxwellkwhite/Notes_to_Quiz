@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, request
+from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_wtf import FlaskForm
@@ -62,7 +62,8 @@ class ChangePassword(FlaskForm):
     new_password = PasswordField("New Password", validators=[DataRequired()])
     submit = SubmitField("Change Password")
 
-class Feedback(FlaskForm):
+class Feedback_Form(FlaskForm):
+    title = StringField("Short Title", validators=[DataRequired()])
     feedback = StringField("Feedback", validators=[DataRequired()])
     submit = SubmitField("Provide Feedback")
 
@@ -102,6 +103,24 @@ class Quiz(db.Model):
     class_name: Mapped[str] = mapped_column(String(250), unique=False, nullable=False)
     total_questions: Mapped[int] = mapped_column(Integer)
     best_score: Mapped[int] = mapped_column(Integer)
+
+# Add new association table for upvotes
+class FeedbackUpvote(db.Model):
+    __tablename__ = "feedback_upvotes"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
+    feedback_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("feedback.id"))
+
+# Update Feedback class to include relationship
+class Feedback(db.Model):
+    __tablename__ = "feedback"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
+    title: Mapped[str] = mapped_column(String(50))
+    feedback: Mapped[str] = mapped_column(String())
+    upvote_count: Mapped[int] = mapped_column(Integer)
+    # Add relationship to track upvoters
+    upvoters = relationship('User', secondary='feedback_upvotes', backref='upvoted_feedback')
 
 with app.app_context():
     db.create_all()
@@ -351,22 +370,50 @@ def change_password():
 
 @app.route('/feedback', methods=['POST', 'GET'])
 def feedback():
-    form=Feedback()
+    form=Feedback_Form()
     if form.validate_on_submit():
-        feedback = form.feedback.data
-        my_email = os.environ.get('FROM_EMAIL')
-        password = os.environ.get('EMAIL_PASS')
-        connection = smtplib.SMTP("smtp.gmail.com", 587)
-        connection.starttls()
-        connection.login(user=my_email, password=password)
-        connection.sendmail(from_addr=my_email, 
-                            to_addrs=os.environ.get('TO_EMAIL'), 
-                            msg=f"Subject:Feedback from {APP_NAME}!\n\nFeedback: {feedback}",
-                            )
-        connection.close()
-        flash('Feedback received! Thank you for taking the time to help.')
-    return render_template("feedback.html", form=form)
+        new_feedback = Feedback(
+            user_id=current_user.id,
+            title=form.title.data,
+            feedback=form.feedback.data,
+            upvote_count=0,
+        )
+        db.session.add(new_feedback)
+        db.session.commit()
+        flash('Feedback submitted! Thank you for taking the time to help.')
+    feedback_list = Feedback.query.all()
+    # Get list of feedback IDs user has upvoted
+    upvoted_feedback_ids = []
+    if current_user.is_authenticated:
+        upvoted_feedback_ids = [f.id for f in current_user.upvoted_feedback]
+    return render_template("feedback.html", form=form, feedback_list=feedback_list, upvoted_feedback_ids=upvoted_feedback_ids)
 
+# Add new route to handle upvotes
+@app.route('/upvote/<int:feedback_id>', methods=['POST'])
+def upvote_feedback(feedback_id):
+    if not current_user.is_authenticated:
+        return jsonify({'error': 'Must be logged in to upvote'}), 401
+        
+    feedback = Feedback.query.get_or_404(feedback_id)
+    
+    # Check if user already upvoted
+    existing_upvote = FeedbackUpvote.query.filter_by(
+        user_id=current_user.id,
+        feedback_id=feedback_id
+    ).first()
+    
+    if existing_upvote:
+        # Remove upvote if already voted
+        db.session.delete(existing_upvote)
+        feedback.upvote_count -= 1
+    else:
+        # Add new upvote
+        new_upvote = FeedbackUpvote(user_id=current_user.id, feedback_id=feedback_id)
+        db.session.add(new_upvote)
+        feedback.upvote_count += 1
+    
+    db.session.commit()
+    return jsonify({'upvote_count': feedback.upvote_count})
 
 if __name__ == "__main__":
     app.run(debug=True, port=5002)

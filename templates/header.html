@@ -35,22 +35,21 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="{{url_for('quiz') }}">Quiz</a>
         </li>
-        {% if not current_user.is_authenticated: %}
         <li class="nav-item">
-          <a class="nav-link" href="{{url_for('register') }}">Register</a>
+          <a class="nav-link" href="{{url_for('feedback') }}">Feedback</a>
         </li>
-        {%endif%}
         {% if not current_user.is_authenticated: %}
         <li class="nav-item">
           <a class="nav-link" href="{{url_for('login') }}">Login</a>
         </li>
-        {%endif%}
+        <li class="nav-item">
+          <a class="nav-link" href="{{url_for('register') }}">Register</a>
+        </li>
+        {% endif %}
         {% if current_user.is_authenticated: %}
         <li class="nav-item">
           <a class="nav-link" href="{{url_for('logout') }}">Logout</a>
         </li>
-        {%endif%}
-        {% if current_user.is_authenticated: %}
         <li class="nav-item">
           <a class="nav-link" href="{{url_for('change_password') }}">Change Password</a>
         </li>
