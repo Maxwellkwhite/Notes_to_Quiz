@@ -69,7 +69,7 @@ class Feedback_Form(FlaskForm):
 
 class NoteInput(FlaskForm):
     class_name = StringField("Class Name", validators=[DataRequired()])
-    title = StringField("Title", validators=[DataRequired()])
+    title = StringField("Quiz Name", validators=[DataRequired()], render_kw={"placeholder": "Example: 'Chapter 1 Quiz'"})
     content = CKEditorField("Notes", validators=[DataRequired()])
     submit = SubmitField("Save Notes")
 
