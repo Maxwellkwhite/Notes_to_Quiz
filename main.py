@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
+from flask import Flask, render_template, redirect, url_for, flash, request, jsonify, session
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_wtf import FlaskForm
@@ -138,7 +138,6 @@ def home_page():
 @app.route('/quiz', methods=["GET", "POST"])
 def quiz():
     form = NoteInput()
-    quiz_json = None
     if form.validate_on_submit():
         # Save notes to the database
         new_note = NoteList(
@@ -191,8 +190,10 @@ def quiz():
     selected_quiz = None
     if request.args.get('quiz_id'):
         selected_quiz = Quiz.query.get(request.args.get('quiz_id'))
-    
-    #need to add notes to note db
+    elif 'new_quiz' in locals():  # Check if new_quiz exists in local scope
+        selected_quiz = new_quiz
+    else:  # Get most recently created quiz
+        selected_quiz = Quiz.query.filter_by(user_id=current_user.id).order_by(Quiz.id.desc()).first()
     return render_template("quiz.html", form=form, selected_quiz=selected_quiz)
 
 @app.route('/quiz-selector', methods=["GET", "POST"])
