@@ -1,0 +1,127 @@
+{% include "header.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addClassModal">
+            <i class="fas fa-plus-circle me-2"></i>Add New Class
+        </button>
+    </div>
+
+    {% if class_list %}
+        <div class="row">
+            {% for class in class_list %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ class.class_name }}</h5>
+                        <ul class="list-group list-group-flush">
+                            {% set class_quizzes = quizzes|selectattr('class_name', 'equalto', class.class_name)|list %}
+                            {% for quiz in class_quizzes %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="text-decoration-none">
+                                    <i class="fas fa-file-alt me-2"></i>{{ quiz.title }}
+                                </a>
+                                <form action="{{ url_for('delete_quiz', quiz_id=quiz.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this quiz?');">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </li>
+                            {% else %}
+                            <li class="list-group-item text-muted">No quizzes yet</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createQuizModal" data-class-name="{{ class.class_name }}">
+                                <i class="fas fa-plus-circle me-2"></i>Add Quiz
+                            </button>
+                            <form action="{{ url_for('delete_class', class_name=class.class_name) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this class?');">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash-alt me-2"></i>Delete Class
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center mt-4">
+            <h3 class="mb-4">No Classes Added Yet</h3>
+            <p>Click the button above to add your first class!</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal for creating a quiz -->
+<div class="modal fade" id="createQuizModal" tabindex="-1" aria-labelledby="createQuizModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createQuizModalLabel">Create Quiz from Notes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('quiz') }}" id="quizForm">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.class_name.label(class="form-label") }}
+                        {{ form.class_name(class="form-control", readonly=true) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.content.label(class="form-label") }}
+                        {{ form.content(class="form-control") }}
+                        {{ ckeditor.load() }}
+                        {{ ckeditor.config(name='content') }}
+                    </div>
+                    {{ form.submit(class="btn btn-primary", value="Generate Quiz") }}
+                </form>
+                <div id="loadingSpinner" class="spinner-grow text-primary position-absolute top-50 start-50 translate-middle" role="status" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for adding class -->
+<div class="modal fade" id="addClassModal" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addClassModalLabel">Add New Class</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('add_class') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="className" class="form-label">Class Name</label>
+                        <input type="text" class="form-control" id="className" name="class_name" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Class
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+
+    // Set the class name in the modal when the "Add Quiz" button is clicked
+    document.querySelectorAll('[data-bs-target="#createQuizModal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const className = this.getAttribute('data-class-name');
+            document.getElementById('class_name').value = className;
+        });
+    });
+</script>
+{% endblock %}

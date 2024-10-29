@@ -104,6 +104,12 @@ class Quiz(db.Model):
     total_questions: Mapped[int] = mapped_column(Integer)
     best_score: Mapped[int] = mapped_column(Integer)
 
+class ClassList(db.Model):
+    __tablename__ = "class_list"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
+    class_name: Mapped[str] = mapped_column(String(250), unique=False, nullable=False)
+
 # Add new association table for upvotes
 class FeedbackUpvote(db.Model):
     __tablename__ = "feedback_upvotes"
@@ -182,14 +188,56 @@ def quiz():
         db.session.add(new_quiz)
         db.session.commit()
     # Check the type of quiz_json
-    quizzes = Quiz.query.filter_by(user_id=current_user.id).all()
-    newest_quiz = quizzes[-1] if quizzes else None
     selected_quiz = None
     if request.args.get('quiz_id'):
         selected_quiz = Quiz.query.get(request.args.get('quiz_id'))
     
     #need to add notes to note db
-    return render_template("quiz.html", form=form, quizzes=quizzes, newest_quiz=newest_quiz, selected_quiz=selected_quiz)
+    return render_template("quiz.html", form=form, selected_quiz=selected_quiz)
+
+@app.route('/quiz-selector', methods=["GET", "POST"])
+def quiz_selector():
+    form = NoteInput()
+    class_list = ClassList.query.filter_by(user_id=current_user.id).all()
+    quizzes = Quiz.query.filter_by(user_id=current_user.id).all()
+    return render_template("quiz_selector.html", form=form, class_list=class_list, quizzes=quizzes)
+
+@app.route('/delete-quiz/<quiz_id>', methods=["POST"])
+def delete_quiz(quiz_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+        
+    quiz_to_delete = Quiz.query.filter_by(id=quiz_id, user_id=current_user.id).first()
+    if quiz_to_delete:
+        db.session.delete(quiz_to_delete)
+        db.session.commit()
+        flash(f'Quiz "{quiz_to_delete.title}" deleted successfully')
+    return redirect(url_for('quiz_selector'))
+
+
+@app.route('/add-class', methods=["GET", "POST"])
+def add_class():
+    if request.method == "POST":
+        new_class = ClassList(user_id=current_user.id, class_name=request.form.get("class_name"))
+        db.session.add(new_class)
+        db.session.commit()
+    return redirect(url_for('quiz_selector'))
+
+@app.route('/delete-class/<class_name>', methods=["POST"])
+def delete_class(class_name):
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+        
+    # Delete the class and associated quizzes
+    class_to_delete = ClassList.query.filter_by(user_id=current_user.id, class_name=class_name).first()
+    if class_to_delete:
+        # Delete associated quizzes
+        Quiz.query.filter_by(user_id=current_user.id, class_name=class_name).delete()
+        # Delete the class
+        db.session.delete(class_to_delete)
+        db.session.commit()
+        flash(f'Class "{class_name}" deleted successfully')
+    return redirect(url_for('quiz_selector'))
 
 @app.route('/update_best_score/<quiz_id>', methods=["GET", "POST"])
 def update_best_score(quiz_id):
@@ -419,6 +467,8 @@ if __name__ == "__main__":
     app.run(debug=True, port=5002)
 
 
+# with app.app_context():
+#     db.create_all()
 
 
 
