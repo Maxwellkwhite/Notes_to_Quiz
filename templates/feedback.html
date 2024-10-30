@@ -11,10 +11,12 @@
                 </div>
                 <div class="card-body">
                     <p class="card-text">Suggest a feature here:</p>
-                    {% with messages = get_flashed_messages() %}
+                    {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-info">{{ message }}</div>
+                            {% for category, message in messages %}
+                                {% if 'feedback' in message.lower() %}
+                                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                                {% endif %}
                             {% endfor %}
                         {% endif %}
                     {% endwith %}
@@ -53,6 +55,10 @@
     </div>
 </div>
 <script>
+if (window.history.replaceState) {
+    window.history.replaceState(null, null, window.location.href);
+}
+
 function upvoteFeedback(feedbackId) {
     fetch(`/upvote/${feedbackId}`, {
         method: 'POST',
@@ -73,5 +79,15 @@ function upvoteFeedback(feedbackId) {
         }
     });
 }
+
+// Clear form after successful submission
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const flashMessages = document.querySelectorAll('.alert-success');
+    
+    if (flashMessages.length > 0) {
+        form.reset();
+    }
+});
 </script>
 {% include "footer.html" %}
