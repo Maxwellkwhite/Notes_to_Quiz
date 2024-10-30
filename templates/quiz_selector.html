@@ -1,7 +1,7 @@
 {% include "header.html" %}
 {% block content %}
-<div class="container mt-5">
-    <div class="text-center mb-4">
+<div class="container mt-4">
+    <div class="text-center mb-3">
         <button type="button" class="create_class_button" data-bs-toggle="modal" data-bs-target="#addClassModal">
             <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -94,7 +94,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="{{ url_for('quiz') }}" id="quizForm">
+                <form method="POST" action="{{ url_for('quiz') }}" id="quizForm" onsubmit="return validateForm()">
                     {{ form.hidden_tag() }}
                     <div class="mb-3">
                         {{ form.class_name.label(class="form-label") }}
@@ -107,6 +107,12 @@
                     <div class="mb-3">
                         {{ form.content.label(class="form-label") }}
                         {{ form.content(class="form-control") }}
+                        <div id="contentError" class="alert alert-danger mt-1" style="display: none;"></div>
+                        {% if form.content.errors %}
+                            {% for error in form.content.errors %}
+                                <div class="alert alert-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
                         {{ ckeditor.load() }}
                         {{ ckeditor.config(name='content') }}
                     </div>
@@ -119,6 +125,20 @@
         </div>
     </div>
 </div>
+
+<script>
+function validateForm() {
+    var content = CKEDITOR.instances.content.getData();
+    var contentLength = content.length;
+    if (contentLength > 7500) {
+        document.getElementById('contentError').innerHTML = "Notes must be less than 7500 characters. You have: " + contentLength + " characters";
+        document.getElementById('contentError').style.display = 'block';
+        return false;
+    }
+    document.getElementById('contentError').style.display = 'none';
+    return true;
+}
+</script>
 
 <!-- Modal for adding class -->
 <div class="modal fade" id="addClassModal" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">

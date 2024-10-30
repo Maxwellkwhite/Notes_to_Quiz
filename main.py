@@ -3,7 +3,7 @@ from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, PasswordField
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import DataRequired, Email, Length
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Date, JSON
 from flask_sqlalchemy import SQLAlchemy
@@ -70,7 +70,7 @@ class Feedback_Form(FlaskForm):
 class NoteInput(FlaskForm):
     class_name = StringField("Class Name", validators=[DataRequired()])
     title = StringField("Quiz Name", validators=[DataRequired()], render_kw={"placeholder": "Example: 'Chapter 1 Quiz'"})
-    content = CKEditorField("Notes", validators=[DataRequired()])
+    content = CKEditorField("Notes", validators=[DataRequired(), Length(max=7500, message="Notes must be less than 7500 characters")])
     submit = SubmitField("Save Notes")
 
 #user DB
@@ -170,7 +170,7 @@ def quiz():
                         ]
                     }}
                     
-                    Here are the notes to base the quiz on:
+                    Make the quiz a suitable length based on the notes provided. Here are the notes to base the quiz on:
                     {form.content.data}"""
                 }
             ]

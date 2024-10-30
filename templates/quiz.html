@@ -136,7 +136,7 @@ document.getElementById('finishQuiz').addEventListener('click', () => {
     const bestScore = {{ selected_quiz.best_score if selected_quiz else 0 }};
     let scoreMessage = `
         <div class="d-flex justify-content-center align-items-center flex-column text-center">
-            <h3 class="text-primary mb-3"><i class="fas fa-trophy me-2"></i>Your final score is ${score}/${totalQuestions} (${Math.round((score / totalQuestions) * 100)}%)</h3>`;
+            <h3 class="text-primary mb-3"><i class="fas fa-trophy me-2"></i>Your final score is ${score}/${totalQuestions}</h3>`;
     if (score > bestScore) {
         scoreMessage += `<h4 class="text-success">You set a new high score of ${score}/${totalQuestions} correct!</h4>`;
     }
