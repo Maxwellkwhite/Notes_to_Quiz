@@ -4,26 +4,27 @@
     <main class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <a href="{{ url_for('quiz_selector') }}" class="btn btn-secondary mt-3 mb-3">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Quizzes
+                <a href="{{ url_for('quiz_selector') }}" class="btn btn-secondary mt-3 mb-1">
+                    Back to Quizzes
                 </a>
                 <!-- Display selected quiz -->
                 {% if selected_quiz %}
                 <div id="quizContainer" class="mt-4 bg-light shadow rounded p-4">
-                    <h2 class="text-primary mb-4 text-center"><i class="fas fa-question-circle me-2"></i>{{ selected_quiz.title }}</h2>
+                    
+                    <h2 class="text-primary mb-4 text-center">{{ selected_quiz.class_name }} - {{ selected_quiz.title }}</h2>
                     <div id="questionContainer" class="mb-4"></div>
                     <div class="d-flex justify-content-center">
                         <button type="button" class="btn btn-primary shadow-sm mx-2" id="nextQuestion" style="display: none;">
-                            <i class="fas fa-arrow-right me-2"></i>Next Question
+                            Next Question
                         </button>
                         <button type="button" class="btn btn-success shadow-sm mx-2" id="finishQuiz" style="display: none;">
-                            <i class="fas fa-check-circle me-2"></i>Finish Quiz
+                            Finish Quiz
                         </button>
                         <button type="button" class="btn btn-info shadow-sm mx-2" id="refreshPage" style="display: none;">
-                            <i class="fas fa-sync-alt me-2"></i>Retry Quiz
+                            Retry Quiz
                         </button>
                         <button type="button" class="btn btn-primary shadow-sm mx-2" id="chooseAnotherQuiz" style="display: none;" onclick="window.location.href='{{ url_for('quiz_selector') }}'">
-                            <i class="fas fa-list me-2"></i>Choose Another Quiz
+                            Choose Another Quiz
                         </button>
                     </div>
                 </div>
@@ -48,8 +49,8 @@ function displayQuestion(index) {
     let html = `
         <div class="card mb-3 shadow-sm">
             <div class="card-body">
-                <h5 class="card-title text-primary"><i class="fas fa-question me-2"></i>${question['question']}</h5>
-                <p class="text-muted"><i class="fas fa-list-ol me-2"></i>Question ${index + 1} of ${quizData.length}</p>
+                <h5 class="card-title text-primary">${question['question']}</h5>
+                <p class="text-muted"></i>Question ${index + 1} of ${quizData.length}</p>
                 ${question['options'].map((option, i) => `
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="radio" name="question" id="option${i}" value="${option}" onchange="checkAnswer()">
@@ -57,8 +58,8 @@ function displayQuestion(index) {
                     </div>
                 `).join('')}
                 <div class="mt-3 feedback" style="display: none;">
-                    <p class="correct-answer alert alert-success" style="display: none;"><i class="fas fa-check-circle me-2"></i>Correct!</p>
-                    <p class="wrong-answer alert alert-danger" style="display: none;"><i class="fas fa-times-circle me-2"></i>Incorrect. The correct answer is: <span class="correct-answer-text"></span></p>
+                    <p class="correct-answer alert alert-success" style="display: none;">Correct!</p>
+                    <p class="wrong-answer alert alert-danger" style="display: none;">Incorrect. The correct answer is: <span class="correct-answer-text"></span></p>
                 </div>
             </div>
         </div>
@@ -91,8 +92,10 @@ function checkAnswer() {
         
         if (currentQuestionIndex < quizData.length - 1) {
             document.getElementById('nextQuestion').style.display = 'block';
+            document.getElementById('nextQuestion').scrollIntoView({ behavior: 'smooth' });
         } else {
             document.getElementById('finishQuiz').style.display = 'block';
+            document.getElementById('finishQuiz').scrollIntoView({ behavior: 'smooth' });
         }
         
         // Disable all radio buttons after an answer is selected
@@ -131,17 +134,19 @@ document.getElementById('finishQuiz').addEventListener('click', () => {
     // Display the final score
     const questionContainer = document.getElementById('questionContainer');
     const bestScore = {{ selected_quiz.best_score if selected_quiz else 0 }};
-    let scoreMessage = `<h3 class="text-primary mb-3"><i class="fas fa-trophy me-2"></i>Your final score is ${score}/${totalQuestions} (${Math.round((score / totalQuestions) * 100)}%)</h3>`;
+    let scoreMessage = `
+        <div class="d-flex justify-content-center align-items-center flex-column text-center">
+            <h3 class="text-primary mb-3"><i class="fas fa-trophy me-2"></i>Your final score is ${score}/${totalQuestions} (${Math.round((score / totalQuestions) * 100)}%)</h3>`;
     if (score > bestScore) {
-        scoreMessage += `<h4 class="text-success"><i class="fas fa-star me-2"></i>You set a new high score of ${score}/${totalQuestions} correct!</h4>`;
+        scoreMessage += `<h4 class="text-success">You set a new high score of ${score}/${totalQuestions} correct!</h4>`;
     }
     if (score < bestScore) {
-        scoreMessage += `<h4 class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>You did not beat your best score of ${bestScore}/${totalQuestions}!</h4>`;
+        scoreMessage += `<h4 class="text-danger">You did not beat your best score of ${bestScore}/${totalQuestions}!</h4>`;
     }
     if (score == bestScore) {
-        scoreMessage += `<h4 class="text-info"><i class="fas fa-equals me-2"></i>You matched your best score of ${bestScore}/${totalQuestions}!</h4>`;
+        scoreMessage += `<h4 class="text-info">You matched your best score of ${bestScore}/${totalQuestions}!</h4>`;
     }
-    questionContainer.innerHTML = `<div class="alert alert-info">${scoreMessage}</div>`;
+    questionContainer.innerHTML = `<div>${scoreMessage}</div>`;
     document.getElementById('finishQuiz').style.display = 'none';
     document.getElementById('refreshPage').style.display = 'block';
     document.getElementById('chooseAnotherQuiz').style.display = 'block';
