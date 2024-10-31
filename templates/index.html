@@ -5,142 +5,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProgressiveLift</title>
+    <title>QuizMe</title>
 </head>
 <body>
-   <section id="main">
-    <br>
-    <br>
-    <a href="https://www.producthunt.com/posts/progressivelift?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-progressivelift" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=501978&theme=dark" alt="ProgressiveLift - Simple&#0032;workout&#0032;tracker&#0032;with&#0032;a&#0032;competitive&#0032;twist | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-        <h1>Track your workouts with a competitive twist 💪</h1>
-        <p>Get the most out of your workouts and focus on the progressive overload. Compete with everyone on the site who improves. With us, there is no excuse to not hit your goals.</p>
-        <form action="{{url_for('register')}}">
-            <button class="btn btn-secondary" role="button">Get Started Today</button>
-        </form>
-   </section>
-   <section id="workout-mockup" class="mt-5">
-    <h2 class="text-center mb-4" style="font-size: 40px;"><strong>Keep Progressively Overloading!</strong></h2>
-    <div class="container">
-        <p class="text-center">We've simplified your tracking. Track the best weight and reps for each lift. This will allow you to focus on truly getting stronger each time you enter the gym.</p>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card mb-3 exercise-item exercise-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="card-title mb-0">Bench Press</h5>
-                            <button type="button" class="btn btn-danger btn-sm">Delete</button>
-                        </div>
-                        <div class="d-flex flex-column">
-                            <div class="mb-2">
-                                <div class="input-group">
-                                    <span class="input-group-text" style="width: 60px; justify-content: center;">Weight</span>
-                                    <input type="number" class="form-control" id="weight-input" value="135" style="-webkit-appearance: none; -moz-appearance: textfield; appearance: textfield;" onchange="checkIncrease('weight')">
-                                </div>
-                            </div>
-                            <div class="mb-2">
-                                <div class="input-group">
-                                    <span class="input-group-text" style="width: 60px; justify-content: center;">Reps</span>
-                                    <select class="form-select" id="reps-select" onchange="checkIncrease('reps')">
-                                        {% for i in range(1, 21) %}
-                                            <option value="{{ i }}" {% if i == 10 %}selected{% endif %}>{{ i }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
+   <div class="container main">
+        <div class="row align-items-center">
+                <h1 class="display-4 mb-4"><strong>Instantly Create Interactive Quizzes From Your Notes</strong></h1>
+                <p class="lead mb-4">Improve your grades and learn smarter. Instantly turn any of your class notes into interactive quizzes to maximize your studying.</p>
+                <div class="mb-4">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            ✅ Create classes to organize your quizzes
+                        </li>
+                        <li class="mb-2">
+                            ✅ Track your progress and identify where you need to study more
+                        </li>
+                        <li class="mb-2">
+                            ✅ Study smarter with AI-powered question generation
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-flex gap-3">
+                        <a href="{{url_for('register')}}" class="btn btn-primary btn-lg">Start Creating Quizzes</a>
+                </div>
+            </div>
+
+        <section class="my-5">
+            <h2 class="text-center mb-4">How It Works</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="display-4 mb-3">📝</div>
+                            <h3>Input Your Notes</h3>
+                            <p>Simply paste your study notes into QuizMe</p>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script>
-        let lastWeight = 135;
-        let lastReps = 10;
-
-        function checkIncrease(type) {
-            let currentValue = type === 'weight' ? 
-                parseInt(document.getElementById('weight-input').value) : 
-                parseInt(document.getElementById('reps-select').value);
-            let lastValue = type === 'weight' ? lastWeight : lastReps;
-
-            if (currentValue > lastValue) {
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 }
-                });
-            }
-
-            if (type === 'weight') {
-                lastWeight = currentValue;
-            } else {
-                lastReps = currentValue;
-            }
-        }
-    </script>
-   </section>
-   <section id="leaderboard" class="py-5">
-    <div class="container">
-        <h2 class="text-center" style="font-size: 40px;"><strong>Climb the Ranks</strong></h2>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card bg-secondary shadow">
-                    <div class="card-body">
-                        <ol class="text-white">
-                            <li>Enter your workouts</li>
-                            <li>Earn points by increasing weight/reps</li>
-                            <li>Stay consistent</li>
-                            <li>Track your progress daily/weekly/monthly</li>
-                        </ol>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="display-4 mb-3">🤖</div>
+                            <h3>AI Generation</h3>
+                            <p>Our AI creates targeted questions from your content</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="display-4 mb-3">✅</div>
+                            <h3>Test Yourself</h3>
+                            <p>Take quizzes and track your progress</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card bg-secondary shadow">
-                    <div class="card-body p-2">
-                        <table class="table table-dark table-hover table-striped mb-0">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th scope="col" class="text-center py-2">#</th>
-                                    <th scope="col" class="py-2">Name</th>
-                                    <th scope="col" class="text-center py-2">Total Points</th>
-                                    <th scope="col" class="text-center py-2">Total Exercises</th>
-                                    <th scope="col" class="text-center py-2">Best Lift</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="mb-3 text-warning" style="outline: 2px solid gold;">
-                                    <th scope="row" class="text-center">1</th>
-                                    <td>John Doe</td>
-                                    <td class="text-center">1500</td>
-                                    <td class="text-center">120</td>
-                                    <td class="text-center">300 lbs</td>
-                                </tr>
-                                <tr class="mb-3" style="outline: 2px solid silver;">
-                                    <th scope="row" class="text-center">2</th>
-                                    <td>Jane Smith</td>
-                                    <td class="text-center">1350</td>
-                                    <td class="text-center">110</td>
-                                    <td class="text-center">280 lbs</td>
-                                </tr>
-                                <tr class="mb-3" style="outline: 2px solid #cd7f32;">
-                                    <th scope="row" class="text-center">3</th>
-                                    <td>Mike Johnson</td>
-                                    <td class="text-center">1200</td>
-                                    <td class="text-center">100</td>
-                                    <td class="text-center">260 lbs</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        </section>
+    <section class="heres-what-youll-do">
+        <h2 class="text-center mb-4">Here's What You'll Do</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <img src="{{url_for('static', filename='images/quiz-example.png')}}" alt="Quiz Example" class="img-fluid">
+            </div>
+            <div class="col-md-6">
+                <img src="{{url_for('static', filename='images/quiz-example.png')}}" alt="Quiz Example" class="img-fluid">
             </div>
         </div>
+    </section>
     </div>
-   </section>
    <section id="pricing">
     <h2 class="text-center mb-4" style="font-size: 40px;"><strong>Pricing Options</strong></h2>
     <div class="row justify-content-center g-2">

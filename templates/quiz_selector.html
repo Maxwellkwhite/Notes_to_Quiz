@@ -3,18 +3,7 @@
 <div class="container mt-4">
     <div class="text-center mb-3">
         <button type="button" class="create_class_button" data-bs-toggle="modal" data-bs-target="#addClassModal">
-            <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
-                ></path>
-              </svg>
-              <span class="text">Add New Class</span>
-              <span class="circle"></span>
-              <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
-                ></path>
-              </svg>
+            Add New Class
         </button>
     </div>
 
@@ -46,7 +35,7 @@
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <h6 class="card-title mb-0">
                                                     <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="text-decoration-none">
-                                                        <i class="fas fa-file-alt me-2"></i>{{ quiz.title }}
+                                                        {{ quiz.title }}
                                                     </a>
                                                         <span class="badge {% if (quiz.best_score / quiz.total_questions * 100)|round == 100 %}bg-success{% else %}bg-danger{% endif %} ms-2">Best: ({{ (quiz.best_score / quiz.total_questions * 100)|round }}%)</span>
                                                 </h6>
@@ -156,10 +145,10 @@ function validateForm() {
                 <form action="{{ url_for('add_class') }}" method="POST">
                     <div class="mb-3">
                         <label for="className" class="form-label">Class Name</label>
-                        <input type="text" class="form-control" id="className" name="class_name" required>
+                        <input type="text" class="form-control" id="className" name="class_name" required placeholder="Example: Biology 101)">
                     </div>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Save Class
+                        Save Class
                     </button>
                 </form>
             </div>

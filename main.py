@@ -304,7 +304,7 @@ def register():
         db.session.commit()
         # This line will authenticate the user with Flask-Login
         login_user(new_user)
-        return redirect(url_for("quiz"))
+        return redirect(url_for("quiz_selector"))
     return render_template("register.html", form=form, current_user=current_user)
 
 @app.route('/login', methods=["GET", "POST"])
@@ -332,7 +332,7 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('INSERT HERE'))
+    return redirect(url_for('home_page'))
 
 #for test of Stripe
 YOUR_DOMAIN = 'http://127.0.0.1:5002'
