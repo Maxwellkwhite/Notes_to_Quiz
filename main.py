@@ -69,8 +69,8 @@ class Feedback_Form(FlaskForm):
 
 class NoteInput(FlaskForm):
     class_name = StringField("Class Name", validators=[DataRequired()])
-    title = StringField("Quiz Name", validators=[DataRequired()], render_kw={"placeholder": "Example: 'Chapter 1 Quiz'"})
-    content = CKEditorField("Notes", validators=[DataRequired(), Length(max=7500, message="Notes must be less than 7500 characters")])
+    title = StringField("Short Quiz Name (Max 20 characters)", validators=[DataRequired(), Length(max=20)], render_kw={"placeholder": "Example: 'Chapter 1 Quiz'"})
+    content = CKEditorField("Notes (Max 7500 characters)", validators=[DataRequired(), Length(max=7500, message="Notes must be less than 7500 characters")])
     submit = SubmitField("Save Notes")
 
 #user DB
@@ -436,6 +436,13 @@ def feedback():
     if current_user.is_authenticated:
         upvoted_feedback_ids = [f.id for f in current_user.upvoted_feedback]
     return render_template("feedback.html", form=form, feedback_list=feedback_list, upvoted_feedback_ids=upvoted_feedback_ids)
+
+@app.route('/delete-feedback/<feedback_id>', methods=['POST'])
+def delete_feedback(feedback_id):
+    feedback = Feedback.query.get_or_404(feedback_id)
+    db.session.delete(feedback)
+    db.session.commit()
+    return jsonify({'success': True})
 
 # Add new route to handle upvotes
 @app.route('/upvote/<int:feedback_id>', methods=['POST'])
