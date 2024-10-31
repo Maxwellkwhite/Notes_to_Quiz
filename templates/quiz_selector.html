@@ -7,6 +7,8 @@
         </button>
     </div>
 
+    <div class="mb-4"></div>
+
     {% if class_list %}
         <div class="row">
             {% for class in class_list %}
@@ -145,7 +147,8 @@ function validateForm() {
                 <form action="{{ url_for('add_class') }}" method="POST">
                     <div class="mb-3">
                         <label for="className" class="form-label">Class Name</label>
-                        <input type="text" class="form-control" id="className" name="class_name" required placeholder="Example: Biology 101)">
+                        <input type="text" class="form-control" id="className" name="class_name" required placeholder="Example: Biology 101" maxlength="20">
+                        <small class="form-text text-muted">Maximum 20 characters</small>
                     </div>
                     <button type="submit" class="btn btn-primary">
                         Save Class

@@ -55,17 +55,7 @@ body {
     }
 }
 
-@keyframes ani {
-    0% {
-        background-position: 0%;
-    }
-
-    100% {
-        background-position: 400%;
-    }
-}
-
-
+/*Quiz Selector*/
 .container.mt-4 {
     .text-center.mt-4 {
         h3.mb-4 {
@@ -79,6 +69,7 @@ body {
             color: var(--quaternary-color);
         }
     }
+    
 }
 
 /* Card Header */
@@ -335,6 +326,8 @@ body {
         }
     }
 }
+
+/* Main Page */
 .container.main {
     margin-top: 100px;
     .display-4.mb-4 {
@@ -384,5 +377,17 @@ body {
         color: var(--tertiary-color);
         background-color: var(--primary-color);
         border-radius: 10px;
+    }
+}
+
+/* Modal */
+.modal-content {
+    background-color: var(--primary-color);
+    color: var(--quaternary-color);
+    .btn.btn-primary {
+        background-color: var(--tertiary-color) !important;
+        border-color: var(--tertiary-color) !important;
+        margin: 0 auto;
+        display: block;
     }
 }
