@@ -26,7 +26,11 @@
                     </ul>
                 </div>
                 <div class="d-flex gap-3">
+                    {% if not current_user.is_authenticated %}
                         <a href="{{url_for('register')}}" class="btn btn-primary btn-lg">Start Creating Quizzes</a>
+                    {% else %}
+                        <a href="{{url_for('quiz_selector')}}" class="btn btn-primary btn-lg">Go to Your Quizzes</a>
+                    {% endif %}
                 </div>
             </div>
 
@@ -62,70 +66,79 @@
                 </div>
             </div>
         </section>
-    <section class="heres-what-youll-do">
-        <h2 class="text-center mb-4">Here's What You'll Do</h2>
-        <div class="row">
-            <div class="col-md-3">
-                <h3>1. Create a new class</h3>
-                <img src="{{url_for('static', filename='images/new_class.png')}}" alt="Create a new class" class="img-fluid">
-                <div class="text-center mt-2">
-                    <i class="fas fa-arrow-down fa-2x"></i>
+        <section class="heres-what-youll-do">
+            <h2 class="text-center mb-4">Here's What You'll Do</h2>
+            <div class="row">
+                <div class="col-md-3">
+                    <h3>1. Create a new class</h3>
+                    <img src="{{url_for('static', filename='images/new_class.png')}}" alt="Create a new class" class="img-fluid">
+                    <div class="text-center mt-2">
+                        <i class="fas fa-arrow-down fa-2x"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <h3>2. Create a quiz</h3>
+                    <img src="{{url_for('static', filename='images/quiz_create.png')}}" alt="Create a quiz" class="img-fluid">
+                    <div class="text-center mt-2">
+                        <i class="fas fa-arrow-down fa-2x"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <h3>3. Take the created quiz</h3>
+                    <img src="{{url_for('static', filename='images/take_quiz.png')}}" alt="Take the quiz" class="img-fluid">
+                    <div class="text-center mt-2">
+                        <i class="fas fa-arrow-down fa-2x"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <h3>4. Track your stats</h3>
+                    <img src="{{url_for('static', filename='images/stats.png')}}" alt="Track your stats" class="img-fluid">
                 </div>
             </div>
-            <div class="col-md-3">
-                <h3>2. Create a quiz</h3>
-                <img src="{{url_for('static', filename='images/quiz_create.png')}}" alt="Create a quiz" class="img-fluid">
-                <div class="text-center mt-2">
-                    <i class="fas fa-arrow-down fa-2x"></i>
+        </section>
+        <section id="pricing">
+            <h2 class="text-center mb-4">Pricing Options</h2>
+            <p class="lead mb-4">We do pricing a little differently... You'll pay for quizzes you want generated.</p>
+            <div class="row justify-content-center g-3">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">10 Quizzes</h5>
+                            <h6 class="card-subtitle mb-2">$4.99</h6>
+                            <p class="card-text">Get 10 quizzes generated.</p>
+                            <p class="card-text-italic">About .50 per quiz.</p>
+                            <a href="{{url_for('register')}}" class="btn btn-primary">Choose Package</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">25 Quizzes</h5>
+                            <h6 class="card-subtitle mb-2">$9.99</h6>
+                            <p class="card-text">Get 25 quizzes generated.</p>
+                            <p class="card-text-italic">About .40 per quiz.</p>
+                            <a href="{{url_for('register')}}" class="btn btn-primary">Choose Package</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="border: 3px solid #FFA500; border-radius: 15px; position: relative; overflow: visible;">
+                        <div style="position: absolute; top: -12px; right: -12px; background-color: #FFA500; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
+                            Best Value!
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">100 Quizzes</h5>
+                            <h6 class="card-subtitle mb-2">$24.99</h6>
+                            <p class="card-text">Get 100 quizzes generated.</p>
+                            <p class="card-text-italic">About .25 per quiz.</p>
+                            <a href="{{url_for('register')}}" class="btn btn-primary">Choose Package</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <h3>3. Take the created quiz</h3>
-                <img src="{{url_for('static', filename='images/take_quiz.png')}}" alt="Take the quiz" class="img-fluid">
-                <div class="text-center mt-2">
-                    <i class="fas fa-arrow-down fa-2x"></i>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <h3>4. Track your stats</h3>
-                <img src="{{url_for('static', filename='images/stats.png')}}" alt="Track your stats" class="img-fluid">
-            </div>
-        </div>
-    </section>
-    </section>
+        </section>
     </div>
-   <section id="pricing">
-    <h2 class="text-center mb-4" style="font-size: 40px;"><strong>Pricing Options</strong></h2>
-    <div class="row justify-content-center g-2">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Year Plan</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">$19.99/year</h6>
-                    <p class="card-text">Access to everything for the year.</p>
-                    <a href="{{url_for('register')}}" class="btn btn-primary">Choose Plan</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card" style="border: 3px solid #ff6b6b; border-radius: 15px; position: relative; overflow: visible;">
-                <div style="position: absolute; top: -12px; right: -12px; background-color: #ff6b6b; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
-                    Most Popular Plan
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Lifetime Plan</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">$29.99</h6>
-                    <p class="card-text">One fee for lifetime access. </p>
-                    <a href="{{url_for('register')}}" class="btn btn-primary">Choose Plan</a>
-                </div>
-            </div>
-        </div>
-    </div>
-   </section>
-    </div>
-   </section>
-    </div>
-   </section>
 
 </body>
 </html>

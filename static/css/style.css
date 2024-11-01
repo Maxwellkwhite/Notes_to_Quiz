@@ -378,7 +378,39 @@ body {
         background-color: var(--primary-color);
         border-radius: 10px;
     }
+    #pricing {
+        margin-top: 60px;
+        .row.justify-content-center.g-3 {
+            text-align: center;
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--tertiary-color);
+        }
+        .card-subtitle.mb-2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--quaternary-color);
+        }
+        .col-md-4 {
+            max-width: 375px;
+        }
+        .card-text {
+            font-size: 1.1rem;
+            margin-bottom: 0px;
+            font-weight: 500;
+            color: var(--quaternary-color);
+        }
+        .card-text-italic {
+            font-size: 0.8rem;
+            font-style: italic;
+            color: var(--quaternary-color);
+            font-weight: 500;
+        }
+    }
 }
+
 
 /* Modal */
 .modal-content {

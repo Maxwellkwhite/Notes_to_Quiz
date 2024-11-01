@@ -255,6 +255,9 @@ def update_best_score(quiz_id):
                 db.session.commit()
     return redirect(url_for('quiz'))
 
+@app.route('/price-page', methods=["GET", "POST"])
+def price_page():
+    return render_template("price_page.html")
 
 @app.route('/notes', methods=["GET", "POST"])
 def notes():
