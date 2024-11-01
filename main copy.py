@@ -70,7 +70,7 @@ class Feedback_Form(FlaskForm):
 class NoteInput(FlaskForm):
     class_name = StringField("Class Name", validators=[DataRequired()])
     title = StringField("Short Quiz Name (Max 20 characters)", validators=[DataRequired(), Length(max=20)], render_kw={"placeholder": "Example: 'Chapter 1 Quiz'"})
-    content = CKEditorField("Notes (Max 15000 characters)", validators=[DataRequired(), Length(max=15000, message="Notes must be less than 15000 characters")])
+    content = CKEditorField("Notes (Max 7500 characters)", validators=[DataRequired(), Length(max=7500, message="Notes must be less than 7500 characters")])
     submit = SubmitField("Save Notes")
 
 #user DB
@@ -151,7 +151,7 @@ def quiz():
         # Create an OpenAI client
         client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         completion = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a quiz generator assistant."},
                 {
@@ -170,15 +170,12 @@ def quiz():
                         ]
                     }}
                     
-                    Don't include the letter in the option choices or correct answer. Make the quiz a suitable length based on the notes provided. Here are the notes to base the quiz on:
+                    Make the quiz a suitable length based on the notes provided. Here are the notes to base the quiz on:
                     {form.content.data}"""
                 }
             ]
         )
-        quiz_json = completion.choices[0].message.content
-        quiz_json = quiz_json.replace("```json\n", "")
-        quiz_json = quiz_json.replace("```", "")
-        quiz_json = json.loads(quiz_json)
+        quiz_json = json.loads(completion.choices[0].message.content)
         new_quiz = Quiz(
             user_id=current_user.id,
             quiz_json=quiz_json,

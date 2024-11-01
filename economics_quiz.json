@@ -1,96 +1,82 @@
-{  
-   "quizTitle":"Economics Quiz",
-   "quizSynopsis":"Test your knowledge on economics concepts like supply and demand, price elasticity, consumer theory, and income / substitution effects.",
-   "questions":[  
-      {  
-         "question":"What does the Demand Curve measure?",
-         "options":[  
-            "Willingness of consumers to buy the good",
-            "Willingness of producers to sell the good",
-            "The minimum wage level",
-            "Economic equity"
-         ],
-         "answer":"Willingness of consumers to buy the good"
-      },
-      {  
-         "question":"What is market equilibrium?",
-         "options":[  
-            "Intersection of supply and demand curve",
-            "When demand is higher than supply",
-            "When supply is higher than demand",
-            "Shift in consumer tastes"
-         ],
-         "answer":"Intersection of supply and demand curve"
-      },
-      {  
-         "question":"What causes the supply and demand curves to shift?",
-         "options":[  
-            "Shocks in consumer tastes",
-            "Shocks to the ability of producers to supply",
-            "Changes in price of complement/substitute goods",
-            "All of the above"
-         ],
-         "answer":"All of the above"
-      },
-      {  
-         "question":"What is the effect of perfectly inelastic demand?",
-         "options":[  
-            "Significant increase in firm revenue",
-            "Significant decrease in firm revenue",
-            "No change in firm revenue",
-            "None of the above"
-         ],
-         "answer":"No change in firm revenue"
-      },
-      {  
-         "question":"What characterizes a good with perfectly elastic demand?",
-         "options":[  
-            "It has perfect substitutes",
-            "It has no substitutes",
-            "Its price doesn't affect its demand",
-            "Its demand doesn't affect its price"
-         ],
-         "answer":"It has perfect substitutes"
-      },
-      {  
-         "question":"What fundamental assumptions are made about consumer preferences?",
-         "options":[  
-            "Preferences decline over time",
-            "Preferences include price considerations",
-            "Preferences are complete, transitive, and non-satiated",
-            "None of the above"
-         ],
-         "answer":"Preferences are complete, transitive, and non-satiated"
-      },
-      {  
-         "question":"What happens when income rises for normal goods?",
-         "options":[  
-            "They decline",
-            "Their consumption remains the same or increases",
-            "Their consumption becomes elastic",
-            "None of the above"
-         ],
-         "answer":"Their consumption remains the same or increases"
-      },
-      {  
-         "question":"What influences a consumer's optimal bundle of goods?",
-         "options":[  
-            "Price trends",
-            "Economic projections",
-            "Point of tangency between the indifference curve and the budget line",
-            "None of the above"
-         ],
-         "answer":"Point of tangency between the indifference curve and the budget line"
-      },
-      {  
-         "question":"What are the effects of an increase in wage rate in labor supply?",
-         "options":[  
-            "It always increases labor supply",
-            "It always decreases labor supply",
-            "It has both an income effect and a substitution effect",
-            "None of the above"
-         ],
-         "answer":"It has both an income effect and a substitution effect"
-      }
-   ]
+{
+    "title": "Principles of Microeconomics Quiz",
+    "questions": [
+        {
+            "question": "What does the intersection of the supply and demand curves represent?",
+            "options": [
+                "Market disequilibrium",
+                "Market equilibrium",
+                "Excess supply",
+                "Excess demand"
+            ],
+            "correct_answer": "Market equilibrium",
+            "explanation": "The intersection of the supply and demand curves is the point at which the quantity supplied equals the quantity demanded, known as market equilibrium."
+        },
+        {
+            "question": "What can cause a shift in the demand curve?",
+            "options": [
+                "Change in consumer taste",
+                "Price of goods",
+                "Market equilibrium",
+                "Decrease in income"
+            ],
+            "correct_answer": "Change in consumer taste",
+            "explanation": "Factors that shift the demand curve include changes in consumer tastes, prices of substitutes or complements, and changes in income, among others."
+        },
+        {
+            "question": "What is the price elasticity of demand in the case of perfectly inelastic demand?",
+            "options": [
+                "Zero",
+                "Infinity",
+                "-1",
+                "Greater than 1"
+            ],
+            "correct_answer": "Zero",
+            "explanation": "In the case of perfectly inelastic demand, the quantity demanded does not change with a change in price, resulting in a price elasticity of zero."
+        },
+        {
+            "question": "Why do indifference curves never cross?",
+            "options": [
+                "They represent complete preferences",
+                "Each curve corresponds to a unique level of utility",
+                "Utility functions are linear",
+                "MRS is always constant"
+            ],
+            "correct_answer": "Each curve corresponds to a unique level of utility",
+            "explanation": "Indifference curves never cross because each one represents a different level of utility, and crossing would imply contradictory preferences."
+        },
+        {
+            "question": "What happens to the budget constraint line if the price of one good increases?",
+            "options": [
+                "The line shifts outward",
+                "The slope decreases",
+                "The line rotates inward",
+                "The line remains unchanged"
+            ],
+            "correct_answer": "The line rotates inward",
+            "explanation": "If the price of one good increases, the budget constraint line rotates inward, indicating the consumer can buy less of that good for the same income."
+        },
+        {
+            "question": "How are normal goods characterized in terms of income elasticity?",
+            "options": [
+                "Income elasticity is negative",
+                "Income elasticity is positive",
+                "Income elasticity is zero",
+                "Income elasticity is greater than one"
+            ],
+            "correct_answer": "Income elasticity is positive",
+            "explanation": "Normal goods have a positive income elasticity of demand, meaning consumption increases as income increases."
+        },
+        {
+            "question": "What term is used to describe a good with a positive own-price elasticity?",
+            "options": [
+                "Giffen good",
+                "Normal good",
+                "Inferior good",
+                "Luxury good"
+            ],
+            "correct_answer": "Giffen good",
+            "explanation": "A Giffen good has a positive own-price elasticity, meaning that an increase in its price can lead to an increase in the quantity demanded, often due to the dominance of the income effect over the substitution effect."
+        }
+    ]
 }
