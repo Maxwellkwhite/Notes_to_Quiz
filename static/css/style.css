@@ -359,6 +359,12 @@ body {
         background-color: var(--tertiary-color) !important; 
         border-color: var(--tertiary-color) !important;
         font-size: 1.5rem;
+        &:hover {
+            background-color: var(--quaternary-color) !important;
+            border-color: var(--quaternary-color) !important;
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
     }
     .my-5 {
         margin-top: 60px !important;
@@ -413,6 +419,11 @@ body {
             color: var(--primary-color);
             background-color: var(--quaternary-color);
             border-color: var(--quaternary-color);
+            &:hover {
+                background-color: var(--tertiary-color) !important;
+                border-color: var(--tertiary-color) !important;
+                transform: translateY(-2px);
+                transition: all 0.3s ease;
         }
         .card {
             background-color: var(--primary-color);
@@ -490,6 +501,7 @@ body {
         }
     }
 }
+
 /*Login Page*/
 .login-page {
     background-color: var(--secondary-color);
