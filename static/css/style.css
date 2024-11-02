@@ -408,6 +408,17 @@ body {
             color: var(--quaternary-color);
             font-weight: 500;
         }
+        .btn.btn-primary {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            background-color: var(--quaternary-color);
+            border-color: var(--quaternary-color);
+        }
+        .card {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
     }
 }
 
