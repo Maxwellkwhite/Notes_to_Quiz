@@ -8,9 +8,13 @@
     </div>
 
     <div class="mb-4"></div>
-
-    {% if class_list %}
-        <div class="row">
+    {%if not current_user.is_authenticated%}
+        <div class="text-center mt-4">
+            <h3 class="mb-4">Please login to view your quizzes</h3>
+        </div>
+    {% else %}
+        {% if class_list %}
+            <div class="row">
             {% for class in class_list %}
             <div class="col-md-4 mb-4">
                 <div class="card shadow-sm">

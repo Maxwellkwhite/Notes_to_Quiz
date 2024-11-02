@@ -202,7 +202,8 @@ def quiz():
 @app.route('/quiz-selector', methods=["GET", "POST"])
 def quiz_selector():
     form = NoteInput()
-    class_list = ClassList.query.filter_by(user_id=current_user.id).all()
+    if current_user:
+        class_list = ClassList.query.filter_by(user_id=current_user.id).all()
     quizzes = Quiz.query.filter_by(user_id=current_user.id).all()
     return render_template("quiz_selector.html", form=form, class_list=class_list, quizzes=quizzes)
 
