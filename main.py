@@ -202,7 +202,9 @@ def quiz():
 @app.route('/quiz-selector', methods=["GET", "POST"])
 def quiz_selector():
     form = NoteInput()
-    if current_user:
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+    elif current_user.is_authenticated:
         class_list = ClassList.query.filter_by(user_id=current_user.id).all()
     quizzes = Quiz.query.filter_by(user_id=current_user.id).all()
     return render_template("quiz_selector.html", form=form, class_list=class_list, quizzes=quizzes)
