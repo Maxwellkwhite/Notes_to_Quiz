@@ -20,9 +20,12 @@ from datetime import date
 import datetime
 import os
 from openai import OpenAI
+import secrets
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 
-APP_NAME = 'ENTER HERE'
+APP_NAME = 'QuizMe'
 stripe.api_key = os.environ.get('STRIPE_API')
 
 
@@ -87,6 +90,8 @@ class User(UserMixin, db.Model):
     end_date_premium: Mapped[Date] = mapped_column(Date)
     points: Mapped[int] = mapped_column(Integer)
     quiz_count: Mapped[int] = mapped_column(Integer)
+    verified: Mapped[bool] = mapped_column(Integer, default=False)
+    verification_token: Mapped[str] = mapped_column(String(100), nullable=True)
 
 class NoteList(db.Model):
     __tablename__ = "note_lists"
@@ -293,35 +298,49 @@ def notes():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
+        try:
+            # Check if user email is already present in the database.
+            result = db.session.execute(db.select(User).where(User.email == form.email.data))
+            user = result.scalar()
+            if user:
+                flash("You've already signed up with that email, log in instead!")
+                return redirect(url_for('login'))
 
-        # Check if user email is already present in the database.
-        result = db.session.execute(db.select(User).where(User.email == form.email.data))
-        user = result.scalar()
-        if user:
-            # User already exists
-            flash("You've already signed up with that email, log in instead!")
-            return redirect(url_for('login'))
-
-        hash_and_salted_password = generate_password_hash(
-            form.password.data,
-            method='pbkdf2:sha256',
-            salt_length=8
-        )
-        new_user = User(
-            email=form.email.data,
-            name=form.name.data,
-            password=hash_and_salted_password,
-            date_of_signup=datetime.date.today(),
-            end_date_premium=datetime.date.today(),
-            premium_level=0,
-            points = 0,
-            quiz_count = 0,
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        # This line will authenticate the user with Flask-Login
-        login_user(new_user)
-        return redirect(url_for("price_page"))
+            # Generate verification token
+            verification_token = secrets.token_urlsafe(32)
+            
+            hash_and_salted_password = generate_password_hash(
+                form.password.data,
+                method='pbkdf2:sha256',
+                salt_length=8
+            )
+            new_user = User(
+                email=form.email.data,
+                name=form.name.data,
+                password=hash_and_salted_password,
+                date_of_signup=datetime.date.today(),
+                end_date_premium=datetime.date.today(),
+                premium_level=0,
+                points=0,
+                quiz_count=0,
+                verified=False,
+                verification_token=verification_token
+            )
+            
+            # Send verification email before committing to database
+            if send_verification_email(form.email.data, verification_token):
+                db.session.add(new_user)
+                db.session.commit()
+                flash("Please check your email to verify your account before logging in.")
+                return redirect(url_for("login"))
+            else:
+                return redirect(url_for("register"))
+                
+        except Exception as e:
+            print(f"Registration error: {str(e)}")
+            flash("An error occurred during registration. Please try again.")
+            return redirect(url_for("register"))
+            
     return render_template("register.html", form=form, current_user=current_user)
 
 @app.route('/login', methods=["GET", "POST"])
@@ -330,19 +349,23 @@ def login():
     if form.validate_on_submit():
         password = form.password.data
         result = db.session.execute(db.select(User).where(User.email == form.email.data))
-        # Note, email in db is unique so will only have one result.
         user = result.scalar()
-        # Email doesn't exist
+        
         if not user:
             flash("That email does not exist, please try again.")
             return redirect(url_for('login'))
-        # Password incorrect
         elif not check_password_hash(user.password, password):
             flash('Password incorrect, please try again.')
             return redirect(url_for('login'))
+        elif not user.verified:
+            flash('Please verify your email before logging in.')
+            return redirect(url_for('login'))
         else:
             login_user(user)
-            return redirect(url_for('quiz_selector'))
+            if user.quiz_count == 0:
+                return redirect(url_for('price_page'))
+            else:
+                return redirect(url_for('quiz_selector'))
 
     return render_template("login.html", form=form, current_user=current_user)
 
@@ -505,12 +528,84 @@ def upvote_feedback(feedback_id):
     db.session.commit()
     return jsonify({'upvote_count': feedback.upvote_count})
 
+def send_verification_email(email, token):
+    try:
+        sender_email = os.environ.get('EMAIL_ADDRESS')
+        sender_password = os.environ.get('EMAIL_PASSWORD')
+        
+        if not sender_email or not sender_password:
+            print("Email credentials not found in environment variables")
+            flash("Error sending verification email. Please contact support.")
+            return False
+        
+        # Create MIME message
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = email
+        msg['Subject'] = f"Verify Your {APP_NAME} Account"
+        
+        # Create HTML body
+        html = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background-color: #f8f9fa; padding: 20px; text-align: center;">
+                    <h1 style="color: #333;">Welcome to {APP_NAME}!</h1>
+                </div>
+                <div style="padding: 20px;">
+                    <p>Thank you for registering! Please verify your email address to complete your account setup.</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="{YOUR_DOMAIN}/verify/{token}" 
+                           style="background-color: #007bff; color: white; padding: 12px 25px; 
+                                  text-decoration: none; border-radius: 5px;">
+                            Verify Email
+                        </a>
+                    </div>
+                    <p style="color: #666; font-size: 0.9em;">
+                        If the button doesn't work, copy and paste this link into your browser:<br>
+                        {YOUR_DOMAIN}/verify/{token}
+                    </p>
+                </div>
+            </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(html, 'html'))
+        
+        # Send email
+        with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
+            connection.starttls()
+            try:
+                connection.login(user=sender_email, password=sender_password)
+                connection.send_message(msg)
+                return True
+            except smtplib.SMTPAuthenticationError:
+                print("Failed to authenticate with Gmail")
+                flash("Error sending verification email. Please contact support.")
+                return False
+                
+    except Exception as e:
+        print(f"Error sending email: {str(e)}")
+        flash("Error sending verification email. Please contact support.")
+        return False
+
+@app.route('/verify/<token>')
+def verify_email(token):
+    user = User.query.filter_by(verification_token=token).first()
+    if user:
+        user.verified = True
+        user.verification_token = None  # Clear the token after use
+        db.session.commit()
+        flash("Your email has been verified! You can now log in.")
+    else:
+        flash("Invalid verification token.")
+    return redirect(url_for('login'))
+
 if __name__ == "__main__":
     app.run(debug=True, port=5002)
 
 
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
 
 
 
