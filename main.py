@@ -342,7 +342,7 @@ def login():
             return redirect(url_for('login'))
         else:
             login_user(user)
-            return redirect(url_for('quiz'))
+            return redirect(url_for('quiz_selector'))
 
     return render_template("login.html", form=form, current_user=current_user)
 
@@ -401,7 +401,7 @@ def create_checkout_session():
 
 @app.route('/cancel', methods=['POST', 'GET'])
 def cancel_session():
-    return redirect(url_for('INSERT HERE'))
+    return redirect(url_for('price_page'))
 
 @app.route('/success', methods=['POST', 'GET'])
 def success_session():

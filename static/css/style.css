@@ -285,47 +285,6 @@ body {
     }
 }
 
-/* From Uiverse.io by akshat-patel28 */ 
-.loader {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -90%);
-    overflow: hidden;
-    border-right: 3px solid;
-    width: 0px;
-    animation: typewriter 2s steps(10) infinite alternate, blink 0.5s steps(10) infinite;
-
-    .loader-text {
-        font-size: 60px;
-        font-weight: 700;
-        background: linear-gradient(to right, var(--tertiary-color), var(--quaternary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        white-space: nowrap;
-    }
-
-    @keyframes typewriter {
-        0% {
-            width: 0px;
-        }
-
-        100% {
-            width: 240px;
-        }
-    }
-
-    @keyframes blink {
-        0% {
-            border-right-color: rgba(255,255,255,.75);
-        }
-
-        100% {
-            border-right-color: transparent;
-        }
-    }
-}
-
 /* Main Page */
 .container.main {
     margin-top: 100px;

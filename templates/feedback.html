@@ -10,17 +10,21 @@
                     <h4 class="mb-0">Provide Feedback</h4>
                 </div>
                 <div class="card-body">
-                    <p class="card-text">Suggest a feature here:</p>
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                {% if 'feedback' in message.lower() %}
-                                    <div class="alert alert-{{ category }} {% if 'submitted' in message.lower() %}text-success{% endif %}">{{ message }}</div>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                    {{render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+                    {% if current_user.is_authenticated %}
+                        <p class="card-text">Suggest a feature here:</p>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    {% if 'feedback' in message.lower() %}
+                                        <div class="alert alert-{{ category }} {% if 'submitted' in message.lower() %}text-success{% endif %}">{{ message }}</div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        {{render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+                    {% else %}
+                        <p class="card-text">Please <a href="{{ url_for('login') }}">sign in</a> to provide feedback.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

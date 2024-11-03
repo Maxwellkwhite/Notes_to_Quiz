@@ -142,7 +142,10 @@
                     {{ form.submit(class="btn btn-primary", value="Generate Quiz") }}
                 </form>
                 <div id="loadingSpinner" class="loader" style="display: none;">
-                    <span class="loader-text">Loading...</span>
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span class="loader-text ms-2">Generating your quiz...</span>
                 </div>
             </div>
         </div>
@@ -159,7 +162,8 @@ function validateForm() {
         return false;
     }
     document.getElementById('contentError').style.display = 'none';
-    document.getElementById('loadingSpinner').style.display = 'block';
+    document.getElementById('loadingSpinner').style.display = 'flex';
+    document.getElementById('quizForm').style.display = 'none';
     return true;
 }
 </script>
@@ -201,3 +205,4 @@ function validateForm() {
     });
 </script>
 {% endblock %}
+{% include "footer.html" %}
