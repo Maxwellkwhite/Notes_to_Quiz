@@ -9,7 +9,7 @@ body {
     background-color: var(--secondary-color);
 }
 
-/* Create Quiz Button */
+/* Create Class Button */
 .create_class_button {
     text-decoration: none;
     position: relative;
@@ -69,10 +69,6 @@ body {
             color: var(--quaternary-color);
         }
     }
-}
-.badge.bg-primary {
-    color: var(--primary-color) !important;
-    background-color: var(--quaternary-color) !important;
 }
 
 /* Card Header */
@@ -181,7 +177,7 @@ body {
     .add_quiz_button {
         border-radius: 15px;
         margin-top: 0;
-        width: 150px;
+        width: 185px;
         background-color: var(--tertiary-color);
         color: var(--primary-color);
         border: 1px solid var(--tertiary-color);

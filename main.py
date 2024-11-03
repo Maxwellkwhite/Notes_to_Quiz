@@ -142,6 +142,10 @@ def home_page():
 def quiz():
     form = NoteInput()
     if form.validate_on_submit():
+        # Check if user has remaining quizzes
+        user = User.query.get(current_user.id)
+        user.quiz_count -= 1
+        db.session.commit()
         # Save notes to the database
         new_note = NoteList(
             user_id=current_user.id,
@@ -338,7 +342,7 @@ def login():
             return redirect(url_for('login'))
         else:
             login_user(user)
-            return redirect(url_for('quiz_selector'))
+            return redirect(url_for('quiz'))
 
     return render_template("login.html", form=form, current_user=current_user)
 

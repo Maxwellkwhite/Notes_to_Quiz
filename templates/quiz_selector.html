@@ -3,18 +3,11 @@
 <div class="container mt-4">
     <div class="text-center mb-3">
         <div class="quiz-counter">
-            <h4 class="mb-1">
+            <h4 class="mb-3">
                 <span class="badge {% if current_user.quiz_count >= 1 and current_user.quiz_count <= 5  %}bg-warning{% elif current_user.quiz_count ==0 %}bg-danger{% else %}bg-success{% endif %} rounded-pill px-4 py-2">
                     Quizzes Remaining: {{ current_user.quiz_count }}
                 </span>
             </h4>
-            <h4 class="mb-4">
-                {% if current_user.quiz_count == 0 %}
-                <a href="{{url_for('price_page')}}" class="badge bg-primary rounded-pill px-4 py-2 text-decoration-none">
-                    Get More Quizzes
-                </a>
-                {% endif %}
-            </h4>  
         </div>
         <button type="button" class="create_class_button" data-bs-toggle="modal" data-bs-target="#addClassModal">
             Add New Class
@@ -72,17 +65,33 @@
                                 </div>
                                 {% endfor %}
                             </div>
+                            {% if current_user.quiz_count > 0 %}
                             <div class="text-center mt-1">
                                 <button type="button" class="add_quiz_button btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createQuizModal" data-class-name="{{ class.class_name }}">
                                     Add New Quiz
                                 </button>
                             </div>
+                            {% else %}
+                            <div class="text-center mt-1">
+                                <a href="{{ url_for('price_page') }}" class="add_quiz_button btn btn-sm btn-primary">
+                                    Purchase More Quizzes
+                                </a>
+                            </div>
+                            {% endif %}
                         {% else %}
+                        {% if current_user.quiz_count > 0 %}
                         <div class="text-center mt-1">
                             <button type="button" class="add_quiz_button btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createQuizModal" data-class-name="{{ class.class_name }}">
                                 Add New Quiz
                             </button>
                         </div>
+                        {% else %}
+                        <div class="text-center mt-1">
+                            <a href="{{ url_for('price_page') }}" class="add_quiz_button btn btn-sm btn-primary">
+                                Purchase More Quizzes
+                            </a>
+                        </div>
+                        {% endif %}
                         {% endif %}
                     </div>
                 </div>
