@@ -2,6 +2,20 @@
 {% block content %}
 <div class="container mt-4">
     <div class="text-center mb-3">
+        <div class="quiz-counter">
+            <h4 class="mb-1">
+                <span class="badge {% if current_user.quiz_count >= 1 and current_user.quiz_count <= 5  %}bg-warning{% elif current_user.quiz_count ==0 %}bg-danger{% else %}bg-success{% endif %} rounded-pill px-4 py-2">
+                    Quizzes Remaining: {{ current_user.quiz_count }}
+                </span>
+            </h4>
+            <h4 class="mb-4">
+                {% if current_user.quiz_count == 0 %}
+                <a href="{{url_for('price_page')}}" class="badge bg-primary rounded-pill px-4 py-2 text-decoration-none">
+                    Get More Quizzes
+                </a>
+                {% endif %}
+            </h4>  
+        </div>
         <button type="button" class="create_class_button" data-bs-toggle="modal" data-bs-target="#addClassModal">
             Add New Class
         </button>
@@ -81,6 +95,8 @@
             <p>Click the button above to add your first class!</p>
         </div>
     {% endif %}
+    {% endif %}
+
 </div>
 
 <!-- Modal for creating a quiz -->

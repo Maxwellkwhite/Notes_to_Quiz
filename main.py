@@ -23,6 +23,8 @@ from openai import OpenAI
 
 
 APP_NAME = 'ENTER HERE'
+stripe.api_key = os.environ.get('STRIPE_API')
+
 
 app = Flask(__name__)
 ckeditor = CKEditor(app)
@@ -84,6 +86,7 @@ class User(UserMixin, db.Model):
     date_of_signup: Mapped[Date] = mapped_column(Date)
     end_date_premium: Mapped[Date] = mapped_column(Date)
     points: Mapped[int] = mapped_column(Integer)
+    quiz_count: Mapped[int] = mapped_column(Integer)
 
 class NoteList(db.Model):
     __tablename__ = "note_lists"
@@ -308,6 +311,7 @@ def register():
             end_date_premium=datetime.date.today(),
             premium_level=0,
             points = 0,
+            quiz_count = 0,
         )
         db.session.add(new_user)
         db.session.commit()
@@ -334,7 +338,7 @@ def login():
             return redirect(url_for('login'))
         else:
             login_user(user)
-            return redirect(url_for('quiz'))
+            return redirect(url_for('quiz_selector'))
 
     return render_template("login.html", form=form, current_user=current_user)
 
@@ -350,7 +354,19 @@ DOMAIN2 = 'https://bingebuddy.us'
 
 @app.route('/create-checkout-session', methods=['POST', 'GET'])
 def create_checkout_session():
+    plan = request.args.get('plan')
     try:
+        if plan == '10':
+            price = 499  # $4.99
+            product_name = '10 Quizzes'
+        elif plan == '25':
+            price = 999  # $9.99
+            product_name = '25 Quizzes'
+        elif plan == '100':
+            price = 2499  # $24.99
+            product_name = '100 Quizzes'
+        else:
+            return "Invalid plan selected", 400
         # stripe.Coupon.create(
         # id="free-test",
         # percent_off=100,
@@ -362,15 +378,19 @@ def create_checkout_session():
         checkout_session = stripe.checkout.Session.create(
             line_items=[{
                 'price_data': {
-                'currency': 'usd',
-                'product_data': {
-                'name': 'Movie Access',},
-                'unit_amount': 299,},
-                'quantity': 1,}],
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': product_name,
+                    },
+                    'unit_amount': price,
+                },
+                'quantity': 1,
+            }],
             mode='payment',
-            allow_promotion_codes = True,
-            success_url=DOMAIN2 + '/success',
-            cancel_url=DOMAIN2 + '/cancel',)
+            allow_promotion_codes=True,
+            success_url=YOUR_DOMAIN + f'/success?plan={plan}',
+            cancel_url=YOUR_DOMAIN + '/cancel',
+        )
     except Exception as e:
         return str(e)
     return redirect(checkout_session.url, code=303)
@@ -382,11 +402,12 @@ def cancel_session():
 @app.route('/success', methods=['POST', 'GET'])
 def success_session():
     with app.app_context():
+        plan = request.args.get('plan')
         g_user = current_user.get_id()
         completed_update = db.session.execute(db.select(User).where(User.id == g_user)).scalar()
-        completed_update.premium_level = 1
+        completed_update.quiz_count = completed_update.quiz_count + int(plan)
         db.session.commit()
-    return redirect(url_for('INSERT HERE'))
+    return redirect(url_for('quiz_selector'))
 
 @app.route('/privacy-policy', methods=['POST', 'GET'])
 def privacy_policy():
@@ -484,8 +505,8 @@ if __name__ == "__main__":
     app.run(debug=True, port=5002)
 
 
-# with app.app_context():
-#     db.create_all()
+with app.app_context():
+    db.create_all()
 
 
 

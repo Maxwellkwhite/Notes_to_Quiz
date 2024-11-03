@@ -69,7 +69,10 @@ body {
             color: var(--quaternary-color);
         }
     }
-    
+}
+.badge.bg-primary {
+    color: var(--primary-color) !important;
+    background-color: var(--quaternary-color) !important;
 }
 
 /* Card Header */
@@ -482,6 +485,7 @@ body {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         max-width: 500px;
         margin: 3rem auto;
+        margin-top: 20px;
         
         .btn.btn-primary {
             background-color: var(--tertiary-color);
@@ -538,6 +542,8 @@ body {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         max-width: 500px;
         margin: 3rem auto;
+        margin-top: 20px;
+
         
         .btn.btn-primary {
             background-color: var(--tertiary-color);
