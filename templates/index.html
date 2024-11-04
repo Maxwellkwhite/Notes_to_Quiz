@@ -67,32 +67,26 @@
             </div>
         </section>
         <section class="heres-what-youll-do">
-            <h2 class="text-center mb-4">Here's What You'll Do</h2>
-            <div class="row">
-                <div class="col-md-3">
-                    <h3>1. Create a new class</h3>
-                    <img src="{{url_for('static', filename='images/new_class.png')}}" alt="Create a new class" class="img-fluid">
-                    <div class="text-center mt-2">
-                        <i class="fas fa-arrow-down fa-2x"></i>
+            <h2 class="text-center mb-4">Study More Efficiently with AI</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h3>Create Classes and Quizzes</h3>
+                            <p>Input your study material and let our AI generate targeted questions to help you learn effectively.</p>
+                            <img src="{{ url_for('static', filename='images/full_view.png') }}" alt="Full view of quiz creation" class="img-fluid rounded mb-3">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <h3>2. Create a quiz</h3>
-                    <img src="{{url_for('static', filename='images/quiz_create.png')}}" alt="Create a quiz" class="img-fluid">
-                    <div class="text-center mt-2">
-                        <i class="fas fa-arrow-down fa-2x"></i>
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h3>Take Interactive Quizzes</h3>
+                            <p>Take quizzes at your own pace and monitor your improvement over time with detailed analytics.</p>
+                            <img src="{{ url_for('static', filename='images/take_quiz.png') }}" alt="Taking a quiz" class="img-fluid rounded mb-3">
+                            <img src="{{ url_for('static', filename='images/feedback.png') }}" alt="Taking a quiz" class="img-fluid rounded mb-3">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <h3>3. Take the created quiz</h3>
-                    <img src="{{url_for('static', filename='images/take_quiz.png')}}" alt="Take the quiz" class="img-fluid">
-                    <div class="text-center mt-2">
-                        <i class="fas fa-arrow-down fa-2x"></i>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <h3>4. Track your stats</h3>
-                    <img src="{{url_for('static', filename='images/stats.png')}}" alt="Track your stats" class="img-fluid">
                 </div>
             </div>
         </section>
