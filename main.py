@@ -25,7 +25,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 
-APP_NAME = 'QuizMe'
+APP_NAME = 'Studyvant'
 stripe.api_key = os.environ.get('STRIPE_API')
 
 
