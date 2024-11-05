@@ -380,7 +380,7 @@ body {
                 background-color: var(--tertiary-color) !important;
                 border-color: var(--tertiary-color) !important;
                 transform: translateY(-2px);
-                transition: all 0.3s ease;
+                transition: all 0.3s ease;}
         }
         .card {
             background-color: var(--primary-color);
@@ -388,8 +388,21 @@ body {
             border-radius: 10px;
         }
     }
-}
-}
+    .study_more_efficiently{
+        margin-top: 60px;
+        .card-body{
+            text-align: center;
+            color: var(--tertiary-color);
+            background-color: var(--primary-color);
+            border-radius: 10px;}
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--quaternary-color);
+        }
+        }
+    }
+
 
 
 /* Modal */
