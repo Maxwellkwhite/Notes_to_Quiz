@@ -377,7 +377,7 @@ def logout():
 #for test of Stripe
 YOUR_DOMAIN = 'http://127.0.0.1:5002'
 #for live of Stripe
-DOMAIN2 = 'https://bingebuddy.us'
+DOMAIN2 = 'https://studyvant.com'
 
 @app.route('/create-checkout-session', methods=['POST', 'GET'])
 def create_checkout_session():
@@ -415,8 +415,8 @@ def create_checkout_session():
             }],
             mode='payment',
             allow_promotion_codes=True,
-            success_url=YOUR_DOMAIN + f'/success?plan={plan}',
-            cancel_url=YOUR_DOMAIN + '/cancel',
+            success_url=DOMAIN2 + f'/success?plan={plan}',
+            cancel_url=DOMAIN2 + '/cancel',
         )
     except Exception as e:
         return str(e)
@@ -601,7 +601,7 @@ def verify_email(token):
     return redirect(url_for('login'))
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5002)
+    app.run(debug=False, port=5002)
 
 
 # with app.app_context():
