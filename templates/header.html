@@ -36,13 +36,21 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="{{url_for('home_page') }}">Home</a>
         </li>
-        {% endif %}
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{{url_for('quiz_selector') }}">Quiz</a>
+          <a class="nav-link" href="#pricing">Pricing</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{url_for('feedback') }}">Feedback</a>
         </li>
+        {% endif %}
+        {% if current_user.is_authenticated: %}
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="{{url_for('quiz_selector') }}">Quiz</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{url_for('feedback') }}">Feedback</a>
+        </li>
+        {% endif %}
       </ul>
       <!-- New separate nav group for auth items -->
       <ul class="navbar-nav ms-auto">

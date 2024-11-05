@@ -531,3 +531,17 @@ body {
         }
     }
 }
+
+footer {
+    background-color: var(--secondary-color) !important;
+    text-align: center;
+    padding: 20px;
+    .text-white {
+        color: var(--quaternary-color) !important;
+        font-size: clamp(1em, 2vw, 1.4em);
+    }
+    .nav-item {
+        font-size: clamp(0.8em, 2vw, 1.2em);
+        color: var(--quaternary-color) !important;
+    }
+}
