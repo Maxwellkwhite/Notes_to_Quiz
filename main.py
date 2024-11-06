@@ -588,13 +588,6 @@ def send_verification_email(email, token):
         flash("Error sending verification email. Please contact support.")
         return False
 
-@app.route('/resend-verification', methods=['POST'])
-def resend_verification():
-    email = request.json.get('email')
-    token = secrets.token_urlsafe(32)
-    send_verification_email(email, token)
-    return jsonify({'success': True})
-
 @app.route('/verify/<token>')
 def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
@@ -605,6 +598,34 @@ def verify_email(token):
         flash("Your email has been verified! You can now log in.")
     else:
         flash("Invalid verification token.")
+    return redirect(url_for('login'))
+
+@app.route('/resend-verification', methods=['POST'])
+def resend_verification():
+    email = request.form.get('email')
+    if not email:
+        flash("Please enter your email address first.")
+        return redirect(url_for('login'))
+        
+    user = User.query.filter_by(email=email.lower()).first()
+    if not user:
+        flash("No account found with that email address.")
+        return redirect(url_for('login'))
+        
+    if user.verified:
+        flash("This email is already verified.")
+        return redirect(url_for('login'))
+        
+    # Generate new verification token
+    new_token = secrets.token_urlsafe(32)
+    user.verification_token = new_token
+    db.session.commit()
+    
+    if send_verification_email(email, new_token):
+        flash("Verification email has been resent. Please check your inbox and spam folder.")
+    else:
+        flash("Error sending verification email. Please try again or contact support.")
+    
     return redirect(url_for('login'))
 
 if __name__ == "__main__":

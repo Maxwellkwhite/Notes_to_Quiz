@@ -36,61 +36,32 @@
           {% endwith %}
           {{render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
           <p class="login-link">Not a member yet? <a href="{{url_for('register')}}">Register here</a></p>
-          <p class="login-link">Didn't receive verification email? <a href="#" data-bs-toggle="modal" data-bs-target="#resendModal">Resend verification</a></p>
-
-          <!-- Modal -->
-          <div class="modal fade" id="resendModal" tabindex="-1" aria-labelledby="resendModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="resendModalLabel">Resend Verification Email</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <form id="resendForm">
-                    <div class="mb-3">
-                      <label for="email" class="form-label">Email address</label>
-                      <input type="email" class="form-control" id="email" required>
-                    </div>
-                  </form>
-                </div>
-                <div class="modal-footer">
-                  <button type="submit" form="resendForm" class="btn btn-primary">Resend</button>
-                </div>
-              </div>
-            </div>
+          <div class="text-center mt-3">
+              <form action="{{ url_for('resend_verification') }}" method="post" id="resendForm">
+                  <input type="hidden" name="email" id="hiddenEmail">
+                  <button type="button" class="btn btn-link" onclick="resendVerification()">
+                      Didn't receive verification email? Click to resend
+                  </button>
+              </form>
           </div>
-
-          <script>
-            document.getElementById('resendForm').addEventListener('submit', function(e) {
-              e.preventDefault();
-              const email = document.getElementById('email').value;
-              
-              fetch('/resend-verification', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({email: email})
-              })
-              .then(response => response.json())
-              .then(data => {
-                if(data.success) {
-                  alert('Verification email sent! Please check your inbox.');
-                } else {
-                  alert(data.message || 'Error sending verification email.');
-                }
-                bootstrap.Modal.getInstance(document.getElementById('resendModal')).hide();
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                alert('Error sending verification email.');
-              });
-            });
-          </script>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    function resendVerification() {
+        // Get the email from the login form
+        const email = document.querySelector('input[name="email"]').value;
+        if (!email) {
+            alert('Please enter your email address first');
+            return;
+        }
+        // Set the hidden input value
+        document.getElementById('hiddenEmail').value = email;
+        // Submit the form
+        document.getElementById('resendForm').submit();
+    }
+  </script>
 
   {% include "footer.html" %}
