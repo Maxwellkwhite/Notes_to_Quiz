@@ -588,6 +588,13 @@ def send_verification_email(email, token):
         flash("Error sending verification email. Please contact support.")
         return False
 
+@app.route('/resend-verification', methods=['POST'])
+def resend_verification():
+    email = request.json.get('email')
+    token = secrets.token_urlsafe(32)
+    send_verification_email(email, token)
+    return jsonify({'success': True})
+
 @app.route('/verify/<token>')
 def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
