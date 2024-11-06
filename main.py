@@ -5,7 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, PasswordField
 from wtforms.validators import DataRequired, Email, Length
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Date, JSON
+from sqlalchemy import Integer, String, Date, JSON, Boolean
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -90,7 +90,7 @@ class User(UserMixin, db.Model):
     end_date_premium: Mapped[Date] = mapped_column(Date)
     points: Mapped[int] = mapped_column(Integer)
     quiz_count: Mapped[int] = mapped_column(Integer)
-    verified: Mapped[bool] = mapped_column(Integer, default=False)
+    verified: Mapped[bool] = mapped_column(Boolean, default=False)
     verification_token: Mapped[str] = mapped_column(String(100), nullable=True)
 
 class NoteList(db.Model):
