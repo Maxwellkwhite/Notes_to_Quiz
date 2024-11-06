@@ -300,7 +300,7 @@ def register():
     if form.validate_on_submit():
         try:
             # Check if user email is already present in the database.
-            result = db.session.execute(db.select(User).where(User.email == form.email.data))
+            result = db.session.execute(db.select(User).where(User.email == form.email.data.lower()))
             user = result.scalar()
             if user:
                 flash("You've already signed up with that email, log in instead!")
@@ -315,7 +315,7 @@ def register():
                 salt_length=8
             )
             new_user = User(
-                email=form.email.data,
+                email=form.email.data.lower(),
                 name=form.name.data,
                 password=hash_and_salted_password,
                 date_of_signup=datetime.date.today(),
@@ -328,10 +328,10 @@ def register():
             )
             
             # Send verification email before committing to database
-            if send_verification_email(form.email.data, verification_token):
+            if send_verification_email(form.email.data.lower(), verification_token):
                 db.session.add(new_user)
                 db.session.commit()
-                flash("Please check your email to verify your account before logging in.")
+                flash("Please check your email to verify your account before logging in. If you don't see the email, please check your spam folder.")
                 return redirect(url_for("login"))
             else:
                 return redirect(url_for("register"))
@@ -348,7 +348,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         password = form.password.data
-        result = db.session.execute(db.select(User).where(User.email == form.email.data))
+        result = db.session.execute(db.select(User).where(User.email == form.email.data.lower()))
         user = result.scalar()
         
         if not user:
@@ -451,7 +451,7 @@ def change_password():
     if form.validate_on_submit():
         password = form.password.data
         new_password = form.new_password.data
-        result = db.session.execute(db.select(User).where(User.email == form.email.data))
+        result = db.session.execute(db.select(User).where(User.email == form.email.data.lower()))
         # Note, email in db is unique so will only have one result.
         user = result.scalar()
         # Email doesn't exist
