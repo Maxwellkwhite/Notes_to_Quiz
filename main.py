@@ -554,7 +554,7 @@ def send_verification_email(email, token):
                 <div style="padding: 20px;">
                     <p>Thank you for registering! Please verify your email address to complete your account setup.</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="{YOUR_DOMAIN}/verify/{token}" 
+                        <a href="{DOMAIN2}/verify/{token}" 
                            style="background-color: #007bff; color: white; padding: 12px 25px; 
                                   text-decoration: none; border-radius: 5px;">
                             Verify Email
@@ -562,7 +562,7 @@ def send_verification_email(email, token):
                     </div>
                     <p style="color: #666; font-size: 0.9em;">
                         If the button doesn't work, copy and paste this link into your browser:<br>
-                        {YOUR_DOMAIN}/verify/{token}
+                        {DOMAIN2}/verify/{token}
                     </p>
                 </div>
             </body>
