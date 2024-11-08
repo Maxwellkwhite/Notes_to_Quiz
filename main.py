@@ -331,7 +331,7 @@ def register():
             if send_verification_email(form.email.data.lower(), verification_token):
                 db.session.add(new_user)
                 db.session.commit()
-                flash("Please check your email to verify your account before logging in. If you don't see the email, please check your spam folder.")
+                flash("Please check your email to verify your account before logging in. If you don't see the email, please check your spam folder. Email will come from mwdynamics@gmail.com")
                 return redirect(url_for("login"))
             else:
                 return redirect(url_for("register"))
@@ -622,7 +622,7 @@ def resend_verification():
     db.session.commit()
     
     if send_verification_email(email, new_token):
-        flash("Verification email has been resent. Please check your inbox and spam folder.")
+        flash("Verification email has been resent. Please check your inbox and spam folder. Email will come from mwdynamics@gmail.com")
     else:
         flash("Error sending verification email. Please try again or contact support.")
     
