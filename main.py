@@ -628,6 +628,19 @@ def resend_verification():
     
     return redirect(url_for('login'))
 
+@app.route('/user-dashboard', methods=['POST', 'GET'])
+def user_dashboard():
+    # Get today's date
+    today = datetime.date.today()
+    
+    # Query users who signed up today
+    new_users = User.query.filter(
+        User.date_of_signup == today
+    ).all()
+    # Get current user
+    current_user_data = User.query.filter_by(id=current_user.id).first()
+    return render_template("user_dashboard.html", new_users=new_users, current_user_data=current_user_data)
+
 if __name__ == "__main__":
     app.run(debug=False, port=5002)
 
