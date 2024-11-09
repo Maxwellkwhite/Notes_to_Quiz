@@ -632,10 +632,11 @@ def resend_verification():
 def user_dashboard():
     # Get today's date
     today = datetime.date.today()
+    three_days_ago = today - datetime.timedelta(days=3)
     
-    # Query users who signed up today
+    # Query users who signed up in the last 3 days
     new_users = User.query.filter(
-        User.date_of_signup == today
+        User.date_of_signup >= three_days_ago
     ).all()
     # Get current user
     current_user_data = User.query.filter_by(id=current_user.id).first()
