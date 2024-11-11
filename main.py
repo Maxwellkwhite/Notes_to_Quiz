@@ -322,7 +322,7 @@ def register():
                 end_date_premium=datetime.date.today(),
                 premium_level=0,
                 points=0,
-                quiz_count=0,
+                quiz_count=1,
                 verified=False,
                 verification_token=verification_token
             )
