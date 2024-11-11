@@ -28,7 +28,7 @@
                         </li>
                     </ul>
                 </div>
-                <p class="lead mb-4">Click the button below to get started to claim a free quiz on us!</p>
+                <p class="lead mb-4"><strong>Click the button below to get started to claim a free quiz on us!</strong></p>
                 <div class="d-flex gap-3">
                     {% if not current_user.is_authenticated %}
                         <a href="{{url_for('register')}}" class="btn btn-primary btn-lg">Start Creating Quizzes</a>
