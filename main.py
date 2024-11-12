@@ -642,6 +642,10 @@ def user_dashboard():
     current_user_data = User.query.filter_by(id=current_user.id).first()
     return render_template("user_dashboard.html", new_users=new_users, current_user_data=current_user_data)
 
+@app.route('/education-resources', methods=['POST', 'GET'])
+def education_resources():
+    return render_template("education_resources.html")
+
 if __name__ == "__main__":
     app.run(debug=False, port=5002)
 
