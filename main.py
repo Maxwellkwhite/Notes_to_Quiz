@@ -163,7 +163,7 @@ def quiz():
         # Create an OpenAI client
         client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         completion = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a quiz generator assistant."},
                 {
