@@ -384,13 +384,13 @@ def create_checkout_session():
     plan = request.args.get('plan')
     try:
         if plan == '10':
-            price = 499  # $4.99
+            price = 299  # $2.99
             product_name = '10 Quizzes'
         elif plan == '25':
-            price = 999  # $9.99
+            price = 499  # $4.99
             product_name = '25 Quizzes'
         elif plan == '100':
-            price = 2499  # $24.99
+            price = 999  # $9.99
             product_name = '100 Quizzes'
         else:
             return "Invalid plan selected", 400
