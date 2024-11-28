@@ -136,23 +136,6 @@ class Feedback(db.Model):
     # Add relationship to track upvoters
     upvoters = relationship('User', secondary='feedback_upvotes', backref='upvoted_feedback')
 
-# Add new form for blog posts
-class BlogPostForm(FlaskForm):
-    title = StringField("Title", validators=[DataRequired(), Length(max=200)])
-    subtitle = StringField("Subtitle", validators=[Length(max=200)])
-    content = CKEditorField("Content", validators=[DataRequired()])
-    submit = SubmitField("Publish Post")
-
-# Add new model for blog posts
-class BlogPost(db.Model):
-    __tablename__ = "blog_posts"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(200), nullable=False)
-    subtitle: Mapped[str] = mapped_column(String(200))
-    date: Mapped[datetime] = mapped_column(Date, nullable=False)
-    content: Mapped[str] = mapped_column(String)
-    author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
-    author = relationship("User", backref="posts")
 
 with app.app_context():
     db.create_all()
@@ -664,74 +647,6 @@ def user_dashboard():
 def education_resources():
     return render_template("education_resources.html")
 
-@app.route('/blog')
-def blog():
-    page = request.args.get('page', 1, type=int)
-    posts = BlogPost.query.order_by(BlogPost.date.desc()).paginate(page=page, per_page=5)
-    return render_template("blog.html", posts=posts)
-
-@app.route('/blog/post/<int:post_id>')
-def blog_post(post_id):
-    post = BlogPost.query.get_or_404(post_id)
-    return render_template("blog_post.html", post=post)
-
-@app.route('/blog/new', methods=["GET", "POST"])
-def create_post():
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-        
-    form = BlogPostForm()
-    if form.validate_on_submit():
-        new_post = BlogPost(
-            title=form.title.data,
-            subtitle=form.subtitle.data,
-            content=form.content.data,
-            author_id=current_user.id,
-            date=datetime.now()
-        )
-        db.session.add(new_post)
-        db.session.commit()
-        return redirect(url_for('blog'))
-        
-    return render_template("create_post.html", form=form, is_edit=False)
-
-@app.route('/blog/edit/<int:post_id>', methods=["GET", "POST"])
-def edit_post(post_id):
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-        
-    post = BlogPost.query.get_or_404(post_id)
-    if post.author_id != current_user.id:
-        return redirect(url_for('blog'))
-        
-    form = BlogPostForm()
-    if form.validate_on_submit():
-        post.title = form.title.data
-        post.subtitle = form.subtitle.data
-        post.content = form.content.data
-        db.session.commit()
-        return redirect(url_for('blog_post', post_id=post.id))
-        
-    # Pre-populate form with existing data
-    if request.method == "GET":
-        form.title.data = post.title
-        form.subtitle.data = post.subtitle
-        form.content.data = post.content
-        
-    return render_template("create_post.html", form=form, is_edit=True)
-
-@app.route('/blog/delete/<int:post_id>', methods=["POST"])
-def delete_post(post_id):
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-        
-    post = BlogPost.query.get_or_404(post_id)
-    if post.author_id != current_user.id:
-        return redirect(url_for('blog'))
-        
-    db.session.delete(post)
-    db.session.commit()
-    return redirect(url_for('blog'))
 
 if __name__ == "__main__":
     app.run(debug=False, port=5002)
