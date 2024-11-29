@@ -11,6 +11,25 @@
             {{ post.content | safe }}
         </div>
     </article>
+
+    {% if related_posts %}
+    <div class="related-posts mt-5">
+        <h3>Related Posts</h3>
+        <div class="list-group">
+            {% for related in related_posts %}
+            <a href="{{ url_for('view_blog_post', post_id=related.id) }}" 
+               class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ related.title }}</h5>
+                    <small>{{ related.date.strftime('%B %d, %Y') }}</small>
+                </div>
+                <p class="mb-1">{{ related.subtitle }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <a href="{{ url_for('view_blog_posts') }}" class="btn btn-outline-primary mt-3">← Back to Blog</a>
 </div>
 {% endblock %} 
