@@ -160,7 +160,6 @@ def create_blog_post():
         
     # Optional: Add admin check
     if current_user.id != 1:  # Assuming user ID 1 is admin
-        flash("You don't have permission to create blog posts.")
         return redirect(url_for('home_page'))
     
     form = BlogPostForm()
@@ -174,7 +173,6 @@ def create_blog_post():
         )
         db.session.add(new_post)
         db.session.commit()
-        flash("Blog post created successfully!")
         return redirect(url_for('view_blog_posts'))  # You'll need to create this route
         
     return render_template("create_blog_post.html", form=form)
@@ -710,13 +708,11 @@ def delete_blog_post(post_id):
         
     # Check if user is admin (assuming admin is user_id 1)
     if current_user.id != 1:
-        flash("You don't have permission to delete blog posts.")
         return redirect(url_for('view_blog_posts'))
     
     post = blog_posts.query.get_or_404(post_id)
     db.session.delete(post)
     db.session.commit()
-    flash("Blog post deleted successfully!")
     
     return redirect(url_for('view_blog_posts'))
 
