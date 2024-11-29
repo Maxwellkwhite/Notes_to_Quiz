@@ -14,7 +14,8 @@
         </div>
         <div class="mb-3">
             {{ form.content.label(class="form-label") }}
-            {{ form.content(class="form-control") }}
+            {{ ckeditor.create() }}
+            {{ form.content() }}
         </div>
         {{ form.submit(class="btn btn-primary") }}
     </form>
