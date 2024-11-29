@@ -1,0 +1,22 @@
+{% include "header.html" %}
+{% block content %}
+<div class="container">
+    <h1>Blog Posts</h1>
+    {% if current_user.is_authenticated and current_user.id == 1 %}
+    <a href="{{ url_for('create_blog_post') }}" class="btn btn-primary mb-3">Create New Post</a>
+    {% endif %}
+    
+    {% for post in posts %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="card-title">{{ post.title }}</h2>
+            <h6 class="card-subtitle mb-2 text-muted">{{ post.subtitle }}</h6>
+            <p class="card-text">
+                <small class="text-muted">Posted on {{ post.date.strftime('%B %d, %Y') }}</small>
+            </p>
+            <a href="{{ url_for('view_blog_post', post_id=post.id) }}" class="btn btn-outline-primary">Read More</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 

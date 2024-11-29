@@ -136,6 +136,60 @@ class Feedback(db.Model):
     # Add relationship to track upvoters
     upvoters = relationship('User', secondary='feedback_upvotes', backref='upvoted_feedback')
 
+class blog_posts(db.Model):
+    __tablename__ = "blog_posts"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(200))
+    subtitle: Mapped[str] = mapped_column(String(200))
+    date: Mapped[Date] = mapped_column(Date)
+    content: Mapped[str] = mapped_column(String())
+    author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
+
+# Add BlogPostForm class with the existing forms
+class BlogPostForm(FlaskForm):
+    title = StringField("Title", validators=[DataRequired(), Length(max=200)])
+    subtitle = StringField("Subtitle", validators=[DataRequired(), Length(max=200)])
+    content = CKEditorField("Content", validators=[DataRequired()])
+    submit = SubmitField("Publish Post")
+
+# Add new route for creating blog posts
+@app.route('/create-blog-post', methods=['GET', 'POST'])
+def create_blog_post():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+        
+    # Optional: Add admin check
+    if current_user.id != 1:  # Assuming user ID 1 is admin
+        flash("You don't have permission to create blog posts.")
+        return redirect(url_for('home_page'))
+    
+    form = BlogPostForm()
+    if form.validate_on_submit():
+        new_post = blog_posts(
+            title=form.title.data,
+            subtitle=form.subtitle.data,
+            content=form.content.data,
+            date=date.today(),
+            author_id=current_user.id
+        )
+        db.session.add(new_post)
+        db.session.commit()
+        flash("Blog post created successfully!")
+        return redirect(url_for('view_blog_posts'))  # You'll need to create this route
+        
+    return render_template("create_blog_post.html", form=form)
+
+# Add route to view all blog posts
+@app.route('/blog', methods=['GET'])
+def view_blog_posts():
+    posts = blog_posts.query.order_by(blog_posts.date.desc()).all()
+    return render_template("blog.html", posts=posts)
+
+# Add route to view individual blog post
+@app.route('/blog/<int:post_id>', methods=['GET'])
+def view_blog_post(post_id):
+    post = blog_posts.query.get_or_404(post_id)
+    return render_template("blog_post.html", post=post)
 
 with app.app_context():
     db.create_all()
