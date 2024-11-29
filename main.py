@@ -144,7 +144,6 @@ class blog_posts(db.Model):
     date: Mapped[Date] = mapped_column(Date)
     content: Mapped[str] = mapped_column(String())
     author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
-    slug: Mapped[str] = mapped_column(String(250), unique=True)
 
 # Add BlogPostForm class with the existing forms
 class BlogPostForm(FlaskForm):
@@ -165,29 +164,16 @@ def create_blog_post():
     
     form = BlogPostForm()
     if form.validate_on_submit():
-        # Generate slug from title
-        slug = form.title.data.lower().replace(' ', '-')
-        # Remove special characters and ensure uniqueness
-        slug = ''.join(e for e in slug if e.isalnum() or e == '-')
-        
-        # Check if slug exists and append number if needed
-        base_slug = slug
-        counter = 1
-        while blog_posts.query.filter_by(slug=slug).first():
-            slug = f"{base_slug}-{counter}"
-            counter += 1
-            
         new_post = blog_posts(
             title=form.title.data,
             subtitle=form.subtitle.data,
             content=form.content.data,
             date=date.today(),
-            author_id=current_user.id,
-            slug=slug
+            author_id=current_user.id
         )
         db.session.add(new_post)
         db.session.commit()
-        return redirect(url_for('view_blog_posts'))
+        return redirect(url_for('view_blog_posts'))  # You'll need to create this route
         
     return render_template("create_blog_post.html", form=form)
 
@@ -198,9 +184,9 @@ def view_blog_posts():
     return render_template("blog.html", posts=posts)
 
 # Add route to view individual blog post
-@app.route('/blog/<slug>', methods=['GET'])
-def view_blog_post(slug):
-    post = blog_posts.query.filter_by(slug=slug).first_or_404()
+@app.route('/blog/<int:post_id>', methods=['GET'])
+def view_blog_post(post_id):
+    post = blog_posts.query.get_or_404(post_id)
     
     # Get total number of posts and current post's position
     total_posts = blog_posts.query.count()
@@ -219,7 +205,7 @@ def view_blog_post(slug):
         related_posts = blog_posts.query.order_by(blog_posts.date.asc()).limit(10).all()
     
     # Remove current post from related posts if present
-    related_posts = [p for p in related_posts if p.id != post.id][:5]
+    related_posts = [p for p in related_posts if p.id != post_id][:5]
     
     return render_template("blog_post.html", post=post, related_posts=related_posts)
 
