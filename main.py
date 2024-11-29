@@ -191,6 +191,8 @@ def view_blog_post(post_id):
     post = blog_posts.query.get_or_404(post_id)
     return render_template("blog_post.html", post=post)
 
+
+
 with app.app_context():
     db.create_all()
 
@@ -701,6 +703,22 @@ def user_dashboard():
 def education_resources():
     return render_template("education_resources.html")
 
+@app.route('/delete-blog-post/<int:post_id>', methods=['POST'])
+def delete_blog_post(post_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+        
+    # Check if user is admin (assuming admin is user_id 1)
+    if current_user.id != 1:
+        flash("You don't have permission to delete blog posts.")
+        return redirect(url_for('view_blog_posts'))
+    
+    post = blog_posts.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    flash("Blog post deleted successfully!")
+    
+    return redirect(url_for('view_blog_posts'))
 
 if __name__ == "__main__":
     app.run(debug=False, port=5002)
