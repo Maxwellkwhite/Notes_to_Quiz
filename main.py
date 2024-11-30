@@ -184,8 +184,8 @@ def view_blog_posts():
     return render_template("blog.html", posts=posts)
 
 # Add route to view individual blog post
-@app.route('/blog/<int:post_id>', methods=['GET'])
-def view_blog_post(post_id):
+@app.route('/blog/<int:post_id>/<string:title>', methods=['GET'])
+def view_blog_post(post_id, title):
     post = blog_posts.query.get_or_404(post_id)
     
     # Get total number of posts and current post's position
