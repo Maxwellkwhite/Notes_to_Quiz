@@ -675,10 +675,18 @@ footer {
         text-align: left;
         font-weight: 500;
         font-size: clamp(32px, 5vw, 60px);
-        color: var(--quaternary-color);
+        color: var(--tertiary-color);
     }
     h2 {
-        color: var(--tertiary-color);
+        color: var(--quaternary-color);
         font-size: clamp(32px, 2vw, 40px);
+    }
+    h3 {
+        color: var(--quaternary-color);
+        font-size: clamp(24px, 2vw, 32px);
+    }
+    p {
+        font-size: clamp(16px, 2vw, 24px);
+        color: var(--quaternary-color);
     }
 }
