@@ -675,7 +675,7 @@ footer {
         text-align: left;
         font-weight: 500;
         font-size: clamp(32px, 5vw, 60px);
-        color: var(--tertiary-color);
+        color: var(--quaternary-color);
     }
     h2 {
         color: var(--quaternary-color);
@@ -690,7 +690,11 @@ footer {
         font-size: clamp(20px, 2vw, 28px);
     }
     p {
-        font-size: clamp(16px, 2vw, 24px);
+        font-size: clamp(16px, 2vw, 20px);
+        color: var(--quaternary-color);
+    }
+    ul {
+        font-size: clamp(16px, 2vw, 20px);
         color: var(--quaternary-color);
     }
 }
