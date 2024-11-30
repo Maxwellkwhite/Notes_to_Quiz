@@ -671,6 +671,13 @@ footer {
     margin-top: 60px;
     margin-left: 20px;
     margin-right: 20px;
+    .btn.btn-outline-primary.mt-3 {
+        background-color: var(--tertiary-color);
+        border-color: var(--tertiary-color);
+        color: var(--primary-color);
+        margin: 0 auto;
+        display: block;
+    }
     h1 {
         text-align: left;
         font-weight: 500;
