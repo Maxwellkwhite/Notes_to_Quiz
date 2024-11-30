@@ -677,6 +677,7 @@ footer {
         color: var(--primary-color);
         margin: 0 auto;
         display: block;
+        margin: 20px
     }
     h1 {
         text-align: left;
