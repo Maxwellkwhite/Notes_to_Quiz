@@ -61,6 +61,9 @@
             <li class="nav-item">
               <a class="nav-link" href="{{url_for('education_resources') }}">Education Resources</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{url_for('view_blog_posts') }}">Blog</a>
+            </li>
             {% endif %}
             {% if current_user.is_authenticated %}
             <li class="nav-item">
@@ -68,6 +71,9 @@
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{url_for('feedback') }}">Feedback</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{url_for('view_blog_posts') }}">Blog</a>
             </li>
             {% endif %}
           </ul>
@@ -95,9 +101,6 @@
             {% if current_user.id == 1 %}
             <li class="nav-item">
               <a class="nav-link" href="{{url_for('user_dashboard') }}">User Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{url_for('view_blog_posts') }}">Blog</a>
             </li>
             {% endif %}
           </ul>
