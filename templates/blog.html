@@ -1,6 +1,6 @@
 {% include "header.html" %}
 {% block content %}
-<div class="container">
+<div class="blog-container">
     <h1>Blog Posts</h1>
     {% if current_user.is_authenticated and current_user.id == 1 %}
     <a href="{{ url_for('create_blog_post') }}" class="btn btn-primary mb-3">Create New Post</a>
