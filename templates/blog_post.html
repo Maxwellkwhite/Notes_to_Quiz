@@ -1,9 +1,10 @@
 {% include "header.html" %}
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <div class="blog-post-container">
     <article>
         <h1>{{ post.title }}</h1>
-        <h4 class="text-muted">{{ post.subtitle }}</h4>
+        <h2>{{ post.subtitle }}</h2>
         <p class="text-muted">
             Posted on {{ post.date.strftime('%B %d, %Y') }}
         </p>
