@@ -685,6 +685,10 @@ footer {
         color: var(--quaternary-color);
         font-size: clamp(24px, 2vw, 32px);
     }
+    h4 {
+        color: var(--quaternary-color);
+        font-size: clamp(20px, 2vw, 28px);
+    }
     p {
         font-size: clamp(16px, 2vw, 24px);
         color: var(--quaternary-color);
