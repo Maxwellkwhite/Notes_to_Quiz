@@ -188,6 +188,11 @@ def view_blog_posts():
 def view_blog_post(post_id, title):
     post = blog_posts.query.get_or_404(post_id)
     
+    # Verify the URL title matches the post title
+    url_title = post.title.lower().replace(' ', '-')
+    if title != url_title:
+        return redirect(url_for('view_blog_post', post_id=post_id, title=url_title))
+    
     # Get total number of posts and current post's position
     total_posts = blog_posts.query.count()
     all_posts = blog_posts.query.order_by(blog_posts.date.asc()).all()
