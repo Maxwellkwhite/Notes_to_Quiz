@@ -697,4 +697,22 @@ footer {
         font-size: clamp(16px, 2vw, 20px);
         color: var(--quaternary-color);
     }
+    .related-posts {
+        background-color: var(--secondary-color);
+        padding: 20px;
+        border-radius: 10px;
+        h3 {
+            color: var(--quaternary-color);
+            font-size: clamp(24px, 2vw, 32px);
+        }
+        h5 {
+            color: var(--quaternary-color);
+            font-size: clamp(16px, 2vw, 20px);
+        }
+        p {
+            font-size: clamp(16px, 2vw, 20px);
+            color: var(--tertiary-color);
+        }
+
+    }
 }
