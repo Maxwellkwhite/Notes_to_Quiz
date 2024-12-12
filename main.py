@@ -267,18 +267,40 @@ def quiz():
                 }
             ]
         )
-        quiz_json = completion.choices[0].message.content
-        quiz_json = quiz_json.replace("```json\n", "")
-        quiz_json = quiz_json.replace("```", "")
-        quiz_json = json.loads(quiz_json)
-        new_quiz = Quiz(
-            user_id=current_user.id,
-            quiz_json=quiz_json,
-            title=form.title.data,
-            class_name=form.class_name.data,
-            best_score=0,
-            total_questions=len(quiz_json["questions"]),
-        )
+        try:
+            # Print raw response for debugging
+            print("Raw response:", completion.choices[0].message.content)
+            
+            quiz_json = completion.choices[0].message.content.strip()  # Remove leading/trailing whitespace
+            
+            # Remove any markdown code block indicators
+            quiz_json = quiz_json.replace("```json", "")
+            quiz_json = quiz_json.replace("```", "")
+            quiz_json = quiz_json.strip()  # Remove any remaining whitespace
+            
+            # Try to parse JSON
+            try:
+                quiz_json = json.loads(quiz_json)
+            except json.JSONDecodeError as e:
+                print(f"JSON parsing error: {e}")
+                print("Attempted to parse:", quiz_json)
+                flash("Error generating quiz. Please try again.")
+                return redirect(url_for('quiz_selector'))
+                
+            # Continue with the rest of your code...
+            new_quiz = Quiz(
+                user_id=current_user.id,
+                quiz_json=quiz_json,
+                title=form.title.data,
+                class_name=form.class_name.data,
+                best_score=0,
+                total_questions=len(quiz_json["questions"]),
+            )
+            
+        except Exception as e:
+            print(f"Error processing quiz: {e}")
+            flash("Error generating quiz. Please try again.")
+            return redirect(url_for('quiz_selector'))
         db.session.add(new_quiz)
         db.session.commit()
     # Check the type of quiz_json
