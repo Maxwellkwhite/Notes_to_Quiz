@@ -408,9 +408,6 @@ def register():
                 flash("You've already signed up with that email, log in instead!")
                 return redirect(url_for('login'))
 
-            # Generate verification token
-            verification_token = secrets.token_urlsafe(32)
-            
             hash_and_salted_password = generate_password_hash(
                 form.password.data,
                 method='pbkdf2:sha256',
@@ -425,18 +422,14 @@ def register():
                 premium_level=0,
                 points=0,
                 quiz_count=1,
-                verified=False,
-                verification_token=verification_token
+                verified=True,  # Set to True by default
+                verification_token=None  # No need for verification token
             )
             
-            # Send verification email before committing to database
-            if send_verification_email(form.email.data.lower(), verification_token):
-                db.session.add(new_user)
-                db.session.commit()
-                flash("Please check your email to verify your account before logging in. If you don't see the email, please check your spam folder. Email will come from mwdynamics@gmail.com")
-                return redirect(url_for("login"))
-            else:
-                return redirect(url_for("register"))
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user)  # Automatically log in the new user
+            return redirect(url_for("quiz_selector"))
                 
         except Exception as e:
             print(f"Registration error: {str(e)}")
@@ -458,9 +451,6 @@ def login():
             return redirect(url_for('login'))
         elif not check_password_hash(user.password, password):
             flash('Password incorrect, please try again.')
-            return redirect(url_for('login'))
-        elif not user.verified:
-            flash('Please verify your email before logging in.')
             return redirect(url_for('login'))
         else:
             login_user(user)
